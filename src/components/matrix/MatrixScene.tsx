@@ -42,6 +42,12 @@ function MatrixField({ effectType }: { effectType: MatrixEffectType }) {
   );
 }
 
+const LoadingFallback = () => (
+  <div className="fixed inset-0 flex items-center justify-center bg-black">
+    <div className="text-matrix-green text-2xl">Loading Matrix...</div>
+  </div>
+);
+
 export function MatrixScene() {
   const matrixEffect = useWeatherStore((state) => state.matrixEffect);
 
@@ -61,7 +67,7 @@ export function MatrixScene() {
         }}
         style={{ background: 'transparent' }}
       >
-        <Suspense fallback={null}>
+        <Suspense fallback={<LoadingFallback />}>
           <MatrixField effectType={matrixEffect} />
         </Suspense>
       </Canvas>

@@ -96,9 +96,3 @@ export interface ApiError {
   cod: string | number;
   message: string;
 }
-
-export interface WeatherApiConfig {
-  apiKey: string;
-  baseUrl: string;
-  units: 'metric' | 'imperial' | 'kelvin';
-}

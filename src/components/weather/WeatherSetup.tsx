@@ -9,7 +9,6 @@ export function WeatherSetup() {
     location,
     isLoading,
     error,
-    isSetupVisible,
     setError
   } = useWeatherStore();
 
@@ -22,7 +21,7 @@ export function WeatherSetup() {
 
   // Auto-initialize if we have API key and location from env
   useEffect(() => {
-    if (env.apiKey && location && !isLoading && !error && isSetupVisible) {
+    if (env.apiKey && location && !isLoading && !error) {
       setStatus('Auto-initializing with environment settings...');
       handleFetchWeather();
     }
@@ -33,12 +32,10 @@ export function WeatherSetup() {
       setStatus(`Error: ${error}`);
     } else if (isLoading) {
       setStatus('Loading...');
-    } else if (!isSetupVisible) {
-      setStatus('Weather data loaded');
     } else if (apiKey) {
       setStatus('API key loaded from environment');
     }
-  }, [error, isLoading, isSetupVisible]);
+  }, [error, isLoading]);
 
   const handleGetCurrentLocation = async () => {
     if (!apiKey.trim()) {

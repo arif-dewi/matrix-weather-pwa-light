@@ -6,10 +6,7 @@ import './index.css';
 
 const rootElement = document.getElementById('root');
 
-if (!rootElement) {
-  console.error('❌ Root element not found!');
-  throw new Error('Root element not found');
-}
+if (!rootElement) throw new Error('Root element not found');
 
 ReactDOM.createRoot(rootElement).render(
   <React.StrictMode>
@@ -18,5 +15,3 @@ ReactDOM.createRoot(rootElement).render(
     </ErrorBoundary>
   </React.StrictMode>,
 );
-
-console.log('✅ React render called!');

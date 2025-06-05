@@ -12,7 +12,6 @@ interface WeatherState {
   // UI State
   isLoading: boolean;
   error: string | null;
-  isSetupVisible: boolean;
   matrixEffect: MatrixEffectType;
 
   // Actions
@@ -21,7 +20,6 @@ interface WeatherState {
   setWeatherData: (data: WeatherData) => void;
   setLoading: (loading: boolean) => void;
   setError: (error: string | null) => void;
-  setSetupVisible: (visible: boolean) => void;
   updateMatrixEffect: (weather: WeatherData) => void;
   resetState: () => void;
 }
@@ -42,7 +40,7 @@ const getMatrixEffectFromWeather = (weather: WeatherData): MatrixEffectType => {
 
 export const useWeatherStore = create<WeatherState>()(
   persist(
-    (set, get) => ({
+    (set) => ({
       // Initial State
       weatherData: null,
       location: env.defaultLocation.latitude && env.defaultLocation.longitude
@@ -52,10 +50,9 @@ export const useWeatherStore = create<WeatherState>()(
           city: env.defaultLocation.city
         }
         : null,
-      apiKey: env.apiKey, // Use environment API key as default
+      apiKey: env.apiKey,
       isLoading: false,
       error: null,
-      isSetupVisible: !env.apiKey, // Hide setup if API key is provided via env
       matrixEffect: 'default',
 
       // Actions
@@ -69,7 +66,6 @@ export const useWeatherStore = create<WeatherState>()(
           weatherData: data,
           matrixEffect: effect,
           error: null,
-          isSetupVisible: false
         });
       },
 
@@ -78,10 +74,7 @@ export const useWeatherStore = create<WeatherState>()(
       setError: (error: string | null) => set({
         error,
         isLoading: false,
-        isSetupVisible: error ? true : get().isSetupVisible
       }),
-
-      setSetupVisible: (visible: boolean) => set({ isSetupVisible: visible }),
 
       updateMatrixEffect: (weather: WeatherData) => {
         const effect = getMatrixEffectFromWeather(weather);
@@ -93,7 +86,6 @@ export const useWeatherStore = create<WeatherState>()(
         location: null,
         isLoading: false,
         error: null,
-        isSetupVisible: true,
         matrixEffect: 'default'
       })
     }),

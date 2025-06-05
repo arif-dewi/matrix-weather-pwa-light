@@ -36,7 +36,7 @@ export const env: EnvironmentConfig = {
 
 // Validation
 if (!env.apiKey && env.isProduction) {
-  console.warn('⚠️ VITE_OPENWEATHER_API_KEY not found. Users will need to provide their own API key.');
+  console.warn('⚠️ VITE_OPENWEATHER_API_KEY not found.');
 }
 
 if (env.isDevelopment && !env.apiKey) {
