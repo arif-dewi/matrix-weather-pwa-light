@@ -72,17 +72,19 @@ export function MatrixParticle({ character, position, effectType }: MatrixPartic
   const animationData = useRef<AnimationData>({
     originalPosition: position,
     floatPhase: Math.random() * Math.PI * 2,
-    floatSpeed: MATRIX_CONFIG.FLOAT_FREQUENCY * (isMobile ? 0.7 : 1),
+    floatSpeed: MATRIX_CONFIG.FLOAT_FREQUENCY,
     fallSpeed: 0,
     isDroppingType: [MatrixEffectType.RAIN, MatrixEffectType.SNOW].includes(effectType),
     lastUpdateTime: 0,
     updateInterval: FRAME_RATES.UPDATE_INTERVAL_MS.NORMAL
   });
 
-  useFrame((state) => {
+  const phaseRef = useRef(Math.random() * Math.PI * 2);
+
+  useFrame((state, delta) => {
     if (!meshRef.current) return;
 
-    const time = state.clock.getElapsedTime();
+    const time = state.clock.getElapsedTime() + phaseRef.current;
     const data = animationData.current;
 
     // Performance optimization: Skip frames on mobile for smoother experience
@@ -91,32 +93,39 @@ export function MatrixParticle({ character, position, effectType }: MatrixPartic
     }
     data.lastUpdateTime = time;
 
-    const speed = settings.speedFactor * (isMobile ? 0.8 : 1);
-    const dampening = isMobile ? 0.8 : 1;
+    const speed = settings.speedFactor * 1.5;
+    const dampening = 1;
 
     switch (effectType) {
       case MatrixEffectType.SUN:
         // Orbital motion
         meshRef.current.position.x = data.originalPosition[0] +
-          Math.sin(time * ANIMATION_SPEEDS.SLOW + data.floatPhase) * 2 * dampening;
+          Math.sin(data.floatPhase + time * ANIMATION_SPEEDS.SLOW) * 2 * dampening;
+
         meshRef.current.position.y = data.originalPosition[1] +
-          Math.cos(time * 0.7 + data.floatPhase) * 1.5 * dampening;
+          Math.cos(data.floatPhase + time * 0.7) * 1.5 * dampening;
         break;
 
       case MatrixEffectType.RAIN:
         // Vertical fall
-        meshRef.current.position.y -= 0.3 * speed;
+        meshRef.current.position.y -= 5 * delta * speed;
+
         if (meshRef.current.position.y < MOVEMENT_BOUNDS.Y_BOTTOM) {
           meshRef.current.position.y = MOVEMENT_BOUNDS.Y_TOP;
+          meshRef.current.position.x = (Math.random() - 0.5) * MOVEMENT_BOUNDS.X;
+          meshRef.current.position.z = (Math.random() - 0.5) * MOVEMENT_BOUNDS.Z;
         }
         break;
 
       case MatrixEffectType.SNOW:
         // Slow fall with drift
-        meshRef.current.position.y -= 0.1 * speed;
-        meshRef.current.position.x += Math.sin(time + data.floatPhase) * 0.02 * dampening;
+        meshRef.current.position.y -= 0.6 * delta * speed;
+        meshRef.current.position.x += Math.sin(time + data.floatPhase) * 0.01 * dampening;
+
         if (meshRef.current.position.y < MOVEMENT_BOUNDS.Y_BOTTOM) {
           meshRef.current.position.y = MOVEMENT_BOUNDS.Y_TOP;
+          meshRef.current.position.x = (Math.random() - 0.5) * MOVEMENT_BOUNDS.X;
+          meshRef.current.position.z = (Math.random() - 0.5) * MOVEMENT_BOUNDS.Z;
         }
         break;
 
@@ -133,8 +142,10 @@ export function MatrixParticle({ character, position, effectType }: MatrixPartic
         const stormIntensity = isMobile ? 0.6 : 1;
         meshRef.current.position.x = data.originalPosition[0] +
           Math.sin(time * ANIMATION_SPEEDS.CHAOTIC + data.floatPhase) * 4 * stormIntensity;
+
         meshRef.current.position.y = data.originalPosition[1] +
           Math.cos(time * 2.5 + data.floatPhase) * 3 * stormIntensity;
+
         meshRef.current.position.z = data.originalPosition[2] +
           Math.sin(time * ANIMATION_SPEEDS.FAST + data.floatPhase) * 2 * stormIntensity;
         break;
@@ -143,6 +154,7 @@ export function MatrixParticle({ character, position, effectType }: MatrixPartic
         // Slow drifting motion
         meshRef.current.position.x = data.originalPosition[0] +
           Math.sin(time * ANIMATION_SPEEDS.VERY_SLOW + data.floatPhase) * 1.5 * dampening;
+
         meshRef.current.position.y = data.originalPosition[1] +
           Math.cos(time * ANIMATION_SPEEDS.VERY_SLOW * 0.7 + data.floatPhase) * 0.8 * dampening;
         break;
@@ -151,6 +163,7 @@ export function MatrixParticle({ character, position, effectType }: MatrixPartic
         // Gentle floating with some drift
         meshRef.current.position.x = data.originalPosition[0] +
           Math.sin(time * data.floatSpeed + data.floatPhase) * MATRIX_CONFIG.FLOAT_AMPLITUDE * dampening;
+
         meshRef.current.position.y = data.originalPosition[1] +
           Math.cos(time * data.floatSpeed * 0.7 + data.floatPhase) * dampening;
         break;
@@ -159,7 +172,7 @@ export function MatrixParticle({ character, position, effectType }: MatrixPartic
       default:
         // Gentle floating
         meshRef.current.position.x = data.originalPosition[0] +
-          Math.sin(time * data.floatSpeed + data.floatPhase) * MATRIX_CONFIG.FLOAT_AMPLITUDE * dampening;
+          Math.sin(data.floatPhase += delta * data.floatSpeed) * MATRIX_CONFIG.FLOAT_AMPLITUDE * dampening;
         meshRef.current.position.y = data.originalPosition[1] +
           Math.cos(time * data.floatSpeed * 0.7 + data.floatPhase) * dampening;
         meshRef.current.position.z = data.originalPosition[2] +
