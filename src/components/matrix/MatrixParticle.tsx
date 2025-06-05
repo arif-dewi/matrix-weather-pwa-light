@@ -82,6 +82,7 @@ export function MatrixParticle({ character, position, effectType }: MatrixPartic
   const phaseRef = useRef(Math.random() * Math.PI * 2);
 
   useFrame((state, delta) => {
+    delta = Math.min(delta, 0.05);
     if (!meshRef.current) return;
 
     const time = state.clock.getElapsedTime() + phaseRef.current;

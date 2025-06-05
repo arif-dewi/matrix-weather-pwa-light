@@ -94,13 +94,6 @@ export function WeatherDisplay() {
             <div>{weatherData.main.pressure} hPa</div>
           </div>
         </div>
-
-        <div
-          className="weather-effect-label"
-          style={{ color: settings.color }}
-        >
-          Effect: {matrixEffect.toUpperCase()}
-        </div>
       </div>
     </div>
   );
