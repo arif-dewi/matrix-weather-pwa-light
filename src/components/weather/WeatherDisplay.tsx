@@ -12,15 +12,15 @@ export function WeatherDisplay() {
 
   if (isLoading) {
     return (
-      <div className="fixed inset-0 flex items-center justify-center z-40">
-        <div className="bg-black/90 border-2 border-matrix-green rounded-xl p-8 text-center backdrop-blur-matrix animate-pulse-matrix">
-          <div className="text-2xl font-bold mb-4 text-matrix-green font-matrix tracking-wider">
+      <div className="loading-display">
+        <div className="loading-card">
+          <div className="loading-title">
             WEATHER MATRIX
           </div>
-          <div className="text-lg text-matrix-green opacity-80">
+          <div className="loading-text">
             Initializing...
           </div>
-          <div className="text-lg text-matrix-green mt-4">
+          <div className="loading-text">
             LOADING DATA STREAM
           </div>
         </div>
@@ -33,16 +33,17 @@ export function WeatherDisplay() {
   }
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center z-40 pointer-events-none">
+    <div className="weather-display">
       <div
-        className="bg-black/90 border-2 rounded-xl p-8 text-center backdrop-blur-matrix shadow-2xl min-w-80 animate-glow"
+        className="weather-card"
         style={{
+          color: settings.color,
           borderColor: settings.color,
           boxShadow: `0 0 30px ${settings.color}40`
         }}
       >
         <div
-          className="text-2xl font-bold mb-6 font-matrix tracking-wider drop-shadow-lg"
+          className="weather-title"
           style={{
             color: settings.color,
             textShadow: `0 0 10px ${settings.color}`
@@ -52,14 +53,15 @@ export function WeatherDisplay() {
         </div>
 
         <div
-          className="text-lg mb-2 opacity-90"
+          className="weather-location"
           style={{ color: settings.color }}
+          title={`${weatherData.name}, ${weatherData.sys.country}`}
         >
           {weatherData.name}, {weatherData.sys.country}
         </div>
 
         <div
-          className="text-5xl font-bold my-6 font-matrix"
+          className="weather-temperature"
           style={{
             color: settings.color,
             textShadow: `0 0 20px ${settings.color}`
@@ -69,31 +71,34 @@ export function WeatherDisplay() {
         </div>
 
         <div
-          className="text-lg mb-6 uppercase tracking-wide"
+          className="weather-description"
           style={{ color: settings.color }}
         >
           {weatherData.weather[0].description}
         </div>
 
         <div
-          className="grid grid-cols-3 gap-4 text-sm opacity-80"
+          className="weather-details"
           style={{ color: settings.color }}
         >
-          <div>
-            <div className="font-semibold">Humidity</div>
+          <div className="weather-detail-item">
+            <div className="weather-detail-label">Humidity</div>
             <div>{weatherData.main.humidity}%</div>
           </div>
-          <div>
-            <div className="font-semibold">Wind</div>
+          <div className="weather-detail-item">
+            <div className="weather-detail-label">Wind</div>
             <div>{weatherData.wind.speed} m/s</div>
           </div>
-          <div>
-            <div className="font-semibold">Pressure</div>
+          <div className="weather-detail-item">
+            <div className="weather-detail-label">Pressure</div>
             <div>{weatherData.main.pressure} hPa</div>
           </div>
         </div>
 
-        <div className="mt-6 text-xs opacity-60" style={{ color: settings.color }}>
+        <div
+          className="weather-effect-label"
+          style={{ color: settings.color }}
+        >
           Effect: {matrixEffect.toUpperCase()}
         </div>
       </div>

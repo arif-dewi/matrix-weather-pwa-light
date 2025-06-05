@@ -1,4 +1,5 @@
 import type { WeatherData, LocationData, ApiError } from '@/types/weather';
+import { API_VALIDATION } from '@/constants/weather';
 
 class WeatherService {
   private readonly baseUrl = 'https://api.openweathermap.org/data/2.5';
@@ -52,8 +53,8 @@ class WeatherService {
         },
         {
           enableHighAccuracy: true,
-          timeout: 10000,
-          maximumAge: 300000 // 5 minutes
+          timeout: API_VALIDATION.TIMEOUT_MS,
+          maximumAge: API_VALIDATION.MAX_AGE_MS
         }
       );
     });
@@ -83,7 +84,8 @@ class WeatherService {
   }
 
   validateApiKey(apiKey: string): boolean {
-    return apiKey.length >= 32 && /^[a-zA-Z0-9]+$/.test(apiKey);
+    return apiKey.length >= API_VALIDATION.MIN_KEY_LENGTH &&
+      API_VALIDATION.KEY_PATTERN.test(apiKey);
   }
 }
 

@@ -1,7 +1,8 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { env } from '@/config/env';
-import type { WeatherData, LocationData, MatrixEffectType } from '@/types/weather';
+import { WeatherData, LocationData } from '@/types/weather';
+import { MatrixEffectType, WeatherCondition, WEATHER_TO_EFFECT_MAP } from '@/constants/weather';
 
 interface WeatherState {
   // Data
@@ -25,17 +26,12 @@ interface WeatherState {
 }
 
 const getMatrixEffectFromWeather = (weather: WeatherData): MatrixEffectType => {
-  const main = weather.weather[0].main.toLowerCase();
+  const mainCondition = weather.weather[0].main as WeatherCondition;
 
-  if (main.includes('thunderstorm') || main.includes('tornado')) return 'storm';
-  if (main.includes('drizzle') || main.includes('rain')) return 'rain';
-  if (main.includes('snow')) return 'snow';
-  if (main.includes('clear')) return 'sun';
-  if (main.includes('cloud')) return 'cloud';
-  if (['mist', 'fog', 'haze', 'smoke', 'dust', 'sand', 'ash'].some(t => main.includes(t))) return 'fog';
-  if (main.includes('squall')) return 'wind';
+  // Use the mapping constant instead of string comparisons
+  const effect = WEATHER_TO_EFFECT_MAP[mainCondition];
 
-  return 'default';
+  return effect || MatrixEffectType.DEFAULT;
 };
 
 export const useWeatherStore = create<WeatherState>()(
@@ -53,7 +49,7 @@ export const useWeatherStore = create<WeatherState>()(
       apiKey: env.apiKey,
       isLoading: false,
       error: null,
-      matrixEffect: 'default',
+      matrixEffect: MatrixEffectType.DEFAULT,
 
       // Actions
       setApiKey: (key: string) => set({ apiKey: key }),
@@ -87,7 +83,7 @@ export const useWeatherStore = create<WeatherState>()(
         location: null,
         isLoading: false,
         error: null,
-        matrixEffect: 'default'
+        matrixEffect: MatrixEffectType.DEFAULT
       })
     }),
     {
