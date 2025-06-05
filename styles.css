@@ -1,0 +1,122 @@
+body {
+    margin: 0;
+    overflow: hidden;
+    background: #000;
+    font-family: 'Courier New', monospace;
+}
+
+.weather-overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 100;
+    background: rgba(0, 20, 0, 0.9);
+    border: 2px solid #00ff00;
+    border-radius: 10px;
+    padding: 30px;
+    text-align: center;
+    color: #00ff00;
+    box-shadow: 0 0 30px rgba(0, 255, 0, 0.5);
+    backdrop-filter: blur(2px);
+    min-width: 300px;
+}
+
+.api-setup {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    z-index: 101;
+    background: rgba(0, 20, 0, 0.9);
+    border: 1px solid #00ff00;
+    border-radius: 5px;
+    padding: 15px;
+    color: #00ff00;
+    font-size: 12px;
+    max-width: 250px;
+}
+
+.api-setup input {
+    background: rgba(0, 0, 0, 0.7);
+    border: 1px solid #00ff00;
+    color: #00ff00;
+    padding: 5px;
+    margin: 5px 0;
+    width: 100%;
+    font-family: 'Courier New', monospace;
+    font-size: 11px;
+}
+
+.api-setup button {
+    background: rgba(0, 50, 0, 0.8);
+    border: 1px solid #00ff00;
+    color: #00ff00;
+    padding: 5px 15px;
+    cursor: pointer;
+    font-family: 'Courier New', monospace;
+    margin: 5px 2px;
+    transition: all 0.2s;
+}
+
+.api-setup button:hover {
+    background: rgba(0, 100, 0, 0.8);
+    box-shadow: 0 0 10px rgba(0, 255, 0, 0.3);
+}
+
+.weather-title {
+    font-size: 24px;
+    margin-bottom: 20px;
+    text-shadow: 0 0 10px #00ff00;
+    letter-spacing: 2px;
+}
+
+.weather-temp {
+    font-size: 48px;
+    margin: 20px 0;
+    text-shadow: 0 0 20px #00ff00;
+    font-weight: bold;
+}
+
+.weather-desc {
+    font-size: 18px;
+    margin: 15px 0;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.weather-details {
+    font-size: 14px;
+    margin-top: 20px;
+    opacity: 0.8;
+}
+
+.weather-location {
+    font-size: 16px;
+    margin-bottom: 10px;
+    opacity: 0.9;
+}
+
+.loading {
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { opacity: 0.5; }
+    50% { opacity: 1; }
+    100% { opacity: 0.5; }
+}
+
+.error {
+    color: #ff3333;
+    border-color: #ff3333;
+    box-shadow: 0 0 30px rgba(255, 51, 51, 0.3);
+}
+
+.matrix-char {
+    position: absolute;
+    color: #00ff00;
+    font-family: 'Courier New', monospace;
+    font-weight: bold;
+    pointer-events: none;
+    text-shadow: 0 0 5px #00ff00;
+}

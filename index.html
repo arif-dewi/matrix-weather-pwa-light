@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Matrix Weather</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<!-- API Setup Panel -->
+<div class="api-setup" id="apiSetup">
+    <div style="margin-bottom: 10px; font-weight: bold;">⚡ WEATHER MATRIX SETUP</div>
+    <div style="font-size: 11px; margin-bottom: 10px; opacity: 0.8;">
+        Get your free API key from:<br>
+        <a href="https://openweathermap.org/api" target="_blank" style="color: #00ff00;">openweathermap.org/api</a>
+    </div>
+    <input type="text" id="apiKey" placeholder="Enter OpenWeatherMap API Key" value="8e331f7d6729809ed24fb74179c38644" />
+    <div style="margin: 10px 0;">
+        <button onclick="getCurrentLocation()">📍 Auto Location</button>
+        <button onclick="setManualLocation()">🌍 Manual</button>
+    </div>
+    <div id="locationInputs" style="display: none;">
+        <input type="text" id="cityName" placeholder="City name (optional)" />
+        <input type="number" id="latitude" placeholder="Latitude" step="any" />
+        <input type="number" id="longitude" placeholder="Longitude" step="any" />
+    </div>
+    <button onclick="fetchWeather()" style="width: 100%; margin-top: 10px;">🚀 INITIALIZE MATRIX</button>
+    <div style="font-size: 10px; margin-top: 10px; opacity: 0.6;">
+        Status: <span id="status">Waiting for setup...</span>
+    </div>
+</div>
+
+<!-- Weather Display -->
+<div class="weather-overlay loading" id="weatherDisplay">
+    <div class="weather-title">WEATHER MATRIX</div>
+    <div class="weather-location" id="location">Initializing...</div>
+    <div class="weather-temp" id="temperature">--°</div>
+    <div class="weather-desc" id="description">LOADING DATA STREAM</div>
+    <div class="weather-details">
+        <div>Humidity: <span id="humidity">--%</span></div>
+        <div>Wind: <span id="wind">-- m/s</span></div>
+        <div>Pressure: <span id="pressure">-- hPa</span></div>
+    </div>
+</div>
+
+<!-- Three.js Canvas Container -->
+<div id="matrix-container"></div>
+
+<script src="script.js"></script>
+</body>
+</html>
