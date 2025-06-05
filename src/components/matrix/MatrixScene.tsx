@@ -49,7 +49,9 @@ const LoadingFallback = () => (
 );
 
 export function MatrixScene() {
-  const matrixEffect = useWeatherStore((state) => state.matrixEffect);
+  const { matrixEffect, isLoading, weatherData } = useWeatherStore();
+
+  if (isLoading || !weatherData) return <LoadingFallback />;
 
   return (
     <div className="fixed inset-0 w-full h-full z-10">

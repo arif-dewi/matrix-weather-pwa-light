@@ -62,6 +62,7 @@ export const useWeatherStore = create<WeatherState>()(
 
       setWeatherData: (data: WeatherData) => {
         const effect = getMatrixEffectFromWeather(data);
+
         set({
           weatherData: data,
           matrixEffect: effect,
@@ -92,9 +93,9 @@ export const useWeatherStore = create<WeatherState>()(
     {
       name: 'matrix-weather-storage',
       partialize: (state) => ({
-        apiKey: state.apiKey,
         location: state.location,
-        weatherData: state.weatherData
+        weatherData: state.weatherData,
+        matrixEffect: state.matrixEffect,
       })
     }
   )

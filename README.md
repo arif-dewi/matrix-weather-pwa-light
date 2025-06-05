@@ -42,9 +42,9 @@ cp .env.example .env.local
 Edit `.env.local`:
 ```env
 VITE_OPENWEATHER_API_KEY=your_api_key_here
-VITE_DEFAULT_LATITUDE=41.9297
-VITE_DEFAULT_LONGITUDE=19.2117
-VITE_DEFAULT_CITY=Ulcinj
+VITE_DEFAULT_LATITUDE=25.2048
+VITE_DEFAULT_LONGITUDE=55.2708
+VITE_DEFAULT_CITY=Dubai
 ```
 
 4. **Start development server**

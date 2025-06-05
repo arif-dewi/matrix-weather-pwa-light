@@ -167,15 +167,6 @@ export function WeatherSetup() {
       <div className="mt-3 text-[9px] opacity-60">
         Status: <span className={error ? 'text-red-400' : ''}>{status}</span>
       </div>
-
-      {error && (
-        <button
-          onClick={() => setError(null)}
-          className="mt-2 text-[9px] text-red-400 hover:text-red-300 transition-colors"
-        >
-          ✖ Clear Error
-        </button>
-      )}
     </div>
   );
 }
