@@ -9,7 +9,7 @@
     "preview": "vite preview",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "type-check": "tsc --noEmit",
-    "copy": "node copyFiles.js"
+    "copy": "node copyFiles.cjs"
   },
   "dependencies": {
     "@react-three/drei": "^9.88.17",
