@@ -38,6 +38,20 @@ export function WeatherSetup() {
     }
   }, [error, isLoading]);
 
+  // Submit on enter key press
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Enter' && showSetup) {
+        event.preventDefault();
+        handleFetchWeather();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [showSetup, cityName, latitude, longitude, apiKey]);
+
+
   const handleGetCurrentLocation = async () => {
     if (!apiKey.trim()) {
       setError('API key is required');

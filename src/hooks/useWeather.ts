@@ -3,6 +3,7 @@ import { useWeatherStore } from '@/stores/weatherStore';
 import { weatherService } from '@/services/weatherService';
 import type { LocationData } from '@/types/weather';
 
+// TODO: GET RID OF THIS, USE SERVICE
 export function useWeather() {
   const {
     setLocation,
