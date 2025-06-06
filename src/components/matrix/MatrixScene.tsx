@@ -88,9 +88,6 @@ const LoadingFallback = () => (
 
 export function MatrixScene() {
   const { weatherData } = useWeatherStore();
-
-  if (!weatherData) return <LoadingFallback />;
-
   const matrixEffect = useWeatherStore((s) => s.matrixEffect);
   const { performanceTier } = usePerformanceOptimization();
   const isMobile = isMobileDevice();
@@ -123,6 +120,8 @@ export function MatrixScene() {
 
     return baseSettings;
   }, [performanceTier, isMobile]);
+
+  if (!weatherData) return <LoadingFallback />;
 
   return (
     <div className="fixed inset-0 w-full h-full z-10">
