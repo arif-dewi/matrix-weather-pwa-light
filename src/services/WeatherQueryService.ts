@@ -23,7 +23,7 @@ export const useWeatherByCoords = (
     queryFn: () => weatherService.fetchWeatherByCoords(lat!, lon!, apiKey),
     enabled: Boolean(lat && lon && apiKey && enabled),
     staleTime: 5 * 60 * 1000, // 5 minutes
-    retry: 2,
+    retry: false,
   });
 };
 
@@ -38,7 +38,7 @@ export const useWeatherByCity = (
     queryFn: () => weatherService.fetchWeatherByCity(city, apiKey),
     enabled: Boolean(city && apiKey && enabled),
     staleTime: QUERY_CONFIG.STALE_TIME.WEATHER,
-    retry: QUERY_CONFIG.RETRY.ATTEMPTS,
+    retry: false,
   });
 };
 
