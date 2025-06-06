@@ -3,458 +3,556 @@
 @tailwind utilities;
 
 @layer base {
-    html {
-        font-family: 'Courier New', monospace;
-        -webkit-text-size-adjust: 100%;
-    }
+  html {
+    font-family: 'Courier New', monospace;
+    -webkit-text-size-adjust: 100%;
+  }
 
-    body {
-        @apply bg-black text-green-500 m-0 p-0 overflow-hidden;
-        overscroll-behavior: none;
-        min-height: 100vh;
-        min-height: 100dvh;
-    }
+  body {
+    @apply bg-black text-green-500 m-0 p-0 overflow-hidden;
+    overscroll-behavior: none;
+    min-height: 100vh;  /* Manual fallback */
+    min-height: 100dvh; /* Progressive enhancement */
+  }
 
-    * {
-        box-sizing: border-box;
-    }
+  * {
+    box-sizing: border-box;
+  }
 }
 
 @layer components {
-    /* Core Matrix Components */
-    .matrix-text {
-        @apply font-mono text-green-500;
-        text-shadow: 0 0 10px currentColor;
-        -webkit-user-select: none;
-        -moz-user-select: none;
-        user-select: none;
-    }
+  /* Core Matrix Components */
+  .matrix-text {
+    @apply font-mono text-green-500;
+    text-shadow: 0 0 10px currentColor;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    user-select: none;
+  }
 
-    .matrix-panel {
-        @apply bg-black border border-green-500 rounded-lg font-mono;
-        background-color: rgba(0, 0, 0, 0.87);
-        backdrop-filter: blur(4px);
-        box-shadow: 0 0 30px rgba(0, 255, 0, 0.2);
-    }
+  .matrix-panel {
+    @apply bg-black border border-green-500 rounded-lg font-mono;
+    background-color: rgba(0, 0, 0, 0.87);
+    backdrop-filter: blur(4px);
+    box-shadow: 0 0 30px rgba(0, 255, 0, 0.2);
+  }
 
-    .matrix-button {
-        @apply bg-green-900 border border-green-500 text-green-500 font-mono rounded;
-        @apply hover:bg-green-500 hover:text-black transition-all cursor-pointer;
-        @apply disabled:opacity-50 disabled:cursor-not-allowed;
-        @apply flex items-center justify-center;
-        min-height: 44px;
-        min-width: 44px;
-        padding: 8px 16px;
-    }
+  .matrix-button {
+    @apply bg-green-900 border border-green-500 text-green-500 font-mono rounded;
+    @apply hover:bg-green-500 hover:text-black transition-all cursor-pointer;
+    @apply disabled:opacity-50 disabled:cursor-not-allowed;
+    @apply flex items-center justify-center;
+    min-height: 44px;
+    min-width: 44px;
+    padding: 8px 16px;
+  }
 
-    .matrix-button:hover:not(:disabled) {
-        box-shadow: 0 0 15px rgba(0, 255, 0, 0.4);
-    }
+  .matrix-button:hover:not(:disabled) {
+    box-shadow: 0 0 15px rgba(0, 255, 0, 0.4);
+  }
 
-    .matrix-input {
-        @apply bg-black border border-green-500 text-green-500 font-mono rounded;
-        @apply focus:outline-none focus:border-white transition-colors;
-        min-height: 44px;
-        padding: 8px 12px;
-        font-size: 16px;
-    }
+  .matrix-input {
+    @apply bg-black border border-green-500 text-green-500 font-mono rounded;
+    @apply focus:outline-none focus:border-white transition-colors;
+    min-height: 44px;
+    padding: 8px 12px;
+    font-size: 16px;
+  }
 
-    .matrix-input::placeholder {
-        @apply text-green-500;
-        opacity: 0.5;
-    }
+  .matrix-input::placeholder {
+    @apply text-green-500;
+    opacity: 0.5;
+  }
 
-    /* Gear Icon Button */
+  /* Gear Icon Button */
+  .gear-button {
+    @apply fixed top-4 left-4 z-50 rounded-full;
+    @apply bg-black border border-green-500 text-green-500 font-mono;
+    @apply flex items-center justify-center cursor-pointer;
+    @apply hover:bg-green-500 hover:text-black transition-all;
+    background-color: rgba(0, 0, 0, 0.87);
+    backdrop-filter: blur(4px);
+    box-shadow: 0 0 20px rgba(0, 255, 0, 0.8);
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    font-size: 18px;
+    animation: matrix-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+
+  .gear-button:hover {
+    background-color: rgba(0, 17, 0, 1);
+    box-shadow: 0 0 30px rgba(0, 255, 0, 1);
+  }
+
+  /* Setup Panel */
+  .setup-panel {
+    @apply fixed top-4 z-50 p-3 text-xs;
+    @apply bg-black border border-green-500 rounded-lg font-mono;
+    background-color: rgba(0, 0, 0, 0.87);
+    backdrop-filter: blur(4px);
+    box-shadow: 0 0 20px rgba(0, 255, 0, 0.8);
+    left: 64px;
+    width: calc(100vw - 5rem);
+    max-width: 320px;
+    animation: matrix-glow 2s ease-in-out infinite alternate;
+  }
+
+  .setup-panel-header {
+    @apply flex justify-between items-center mb-3;
+  }
+
+  .setup-panel-title {
+    @apply font-bold text-sm;
+  }
+
+  .setup-panel-close {
+    @apply text-red-400 hover:text-red-300 text-xl cursor-pointer;
+  }
+
+  .setup-button-group {
+    @apply flex flex-col gap-2 mb-3;
+  }
+
+  .setup-button {
+    @apply bg-green-900 border border-green-500 text-green-500 font-mono rounded;
+    @apply hover:bg-green-500 hover:text-black transition-all;
+    @apply disabled:opacity-50 disabled:cursor-not-allowed;
+    @apply w-full flex items-center justify-center text-xs;
+    min-height: 32px;
+    padding: 4px 8px;
+  }
+
+  .setup-inputs {
+    @apply mb-3 space-y-2;
+  }
+
+  .setup-input {
+    @apply w-full bg-black border border-green-500 text-green-500 font-mono rounded;
+    @apply focus:outline-none focus:border-white transition-colors;
+    @apply text-xs;
+    min-height: 32px;
+    padding: 8px;
+    font-size: 16px;
+  }
+
+  .setup-input::placeholder {
+    @apply text-green-500;
+    opacity: 0.5;
+  }
+
+  .coordinate-inputs {
+    @apply flex gap-1;
+  }
+
+  .coordinate-input {
+    @apply flex-1 bg-black border border-green-500 text-green-500 font-mono rounded;
+    @apply focus:outline-none focus:border-white transition-colors;
+    @apply text-xs;
+    min-height: 32px;
+    padding: 8px;
+    font-size: 16px;
+  }
+
+  .coordinate-input::placeholder {
+    @apply text-green-500;
+    opacity: 0.5;
+  }
+
+  .initialize-button {
+    @apply w-full bg-green-900 border border-green-500 text-green-500 font-mono rounded;
+    @apply hover:bg-green-500 hover:text-black transition-all;
+    @apply disabled:opacity-50 disabled:cursor-not-allowed;
+    @apply font-bold flex items-center justify-center text-xs;
+    min-height: 36px;
+    animation: matrix-glow 2s ease-in-out infinite alternate;
+  }
+
+  .status-text {
+    @apply mt-3 text-xs break-words;
+    opacity: 0.6;
+  }
+
+  .status-error {
+    @apply text-red-400;
+  }
+
+  /* Weather Display */
+  .weather-display {
+    @apply fixed inset-0 flex items-center justify-center z-30 p-4;
+    pointer-events: none;
+  }
+
+  .weather-card {
+    @apply w-full text-center p-4;
+    @apply bg-black border-2 rounded-xl font-mono;
+    backdrop-filter: blur(4px);
+    background-color: rgba(0, 0, 0, 0.9);
+    max-width: 90vw;
+    animation: matrix-glow 2s ease-in-out infinite alternate;
+  }
+
+  .weather-title {
+    @apply font-bold mb-4 tracking-wider text-lg;
+    text-shadow: 0 0 10px currentColor;
+    font-family: 'Courier New', monospace;
+  }
+
+  .weather-location {
+    @apply mb-2 truncate text-sm;
+    opacity: 0.9;
+  }
+
+  .weather-temperature {
+    @apply font-bold my-4 text-3xl;
+    text-shadow: 0 0 20px currentColor;
+    font-family: 'Courier New', monospace;
+  }
+
+  .weather-description {
+    @apply mb-4 uppercase tracking-wide text-sm;
+  }
+
+  .weather-details {
+    @apply grid gap-3 text-xs;
+    grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+    opacity: 0.8;
+  }
+
+  .weather-detail-item {
+    @apply flex justify-between;
+  }
+
+  .weather-detail-label {
+    @apply font-semibold;
+  }
+
+  .weather-effect-label {
+    @apply mt-4 text-xs;
+    opacity: 0.6;
+  }
+
+  /* Loading States */
+  .loading-display {
+    @apply fixed inset-0 flex items-center justify-center z-40 p-4;
+  }
+
+  .loading-card {
+    @apply w-full text-center p-4;
+    @apply bg-black border-2 border-green-500 rounded-xl font-mono;
+    backdrop-filter: blur(4px);
+    background-color: rgba(0, 0, 0, 0.9);
+    max-width: 90vw;
+    animation: matrix-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+
+  .loading-title {
+    @apply font-bold mb-3 tracking-wider text-xl text-green-500;
+    text-shadow: 0 0 10px currentColor;
+    font-family: 'Courier New', monospace;
+  }
+
+  .loading-text {
+    @apply text-base text-green-500;
+    opacity: 0.8;
+  }
+
+  /* Responsive Breakpoints */
+  @media (min-width: 640px) {
     .gear-button {
-        @apply fixed top-4 left-4 z-50 rounded-full;
-        @apply bg-black border border-green-500 text-green-500 font-mono;
-        @apply flex items-center justify-center cursor-pointer;
-        @apply hover:bg-green-500 hover:text-black transition-all;
-        background-color: rgba(0, 0, 0, 0.87);
-        backdrop-filter: blur(4px);
-        box-shadow: 0 0 20px rgba(0, 255, 0, 0.8);
-        width: 40px;
-        height: 40px;
-        padding: 0;
-        font-size: 18px;
-        animation: matrix-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+      width: 48px;
+      height: 48px;
+      font-size: 20px;
     }
 
-    .gear-button:hover {
-        background-color: rgba(0, 17, 0, 1);
-        box-shadow: 0 0 30px rgba(0, 255, 0, 1);
-    }
-
-    /* Setup Panel */
     .setup-panel {
-        @apply fixed top-4 z-50 p-3 text-xs;
-        @apply bg-black border border-green-500 rounded-lg font-mono;
-        background-color: rgba(0, 0, 0, 0.87);
-        backdrop-filter: blur(4px);
-        box-shadow: 0 0 20px rgba(0, 255, 0, 0.8);
-        left: 64px;
-        width: calc(100vw - 5rem);
-        max-width: 320px;
-        animation: matrix-glow 2s ease-in-out infinite alternate;
-    }
-
-    .setup-panel-header {
-        @apply flex justify-between items-center mb-3;
-    }
-
-    .setup-panel-title {
-        @apply font-bold text-sm;
-    }
-
-    .setup-panel-close {
-        @apply text-red-400 hover:text-red-300 text-xl cursor-pointer;
+      left: 72px;
+      width: 320px;
+      @apply p-4 text-sm;
     }
 
     .setup-button-group {
-        @apply flex flex-col gap-2 mb-3;
+      @apply flex-col gap-2 mb-3;
     }
 
     .setup-button {
-        @apply bg-green-900 border border-green-500 text-green-500 font-mono rounded;
-        @apply hover:bg-green-500 hover:text-black transition-all;
-        @apply disabled:opacity-50 disabled:cursor-not-allowed;
-        @apply w-full flex items-center justify-center text-xs;
-        min-height: 32px;
-        padding: 4px 8px;
+      @apply text-sm w-full;
+      min-height: 36px;
+      padding: 6px 12px;
     }
 
-    .setup-inputs {
-        @apply mb-3 space-y-2;
-    }
-
-    .setup-input {
-        @apply w-full bg-black border border-green-500 text-green-500 font-mono rounded;
-        @apply focus:outline-none focus:border-white transition-colors;
-        @apply text-xs;
-        min-height: 32px;
-        padding: 8px;
-        font-size: 16px;
-    }
-
-    .setup-input::placeholder {
-        @apply text-green-500;
-        opacity: 0.5;
-    }
-
-    .coordinate-inputs {
-        @apply flex gap-1;
-    }
-
+    .setup-input,
     .coordinate-input {
-        @apply flex-1 bg-black border border-green-500 text-green-500 font-mono rounded;
-        @apply focus:outline-none focus:border-white transition-colors;
-        @apply text-xs;
-        min-height: 32px;
-        padding: 8px;
-        font-size: 16px;
-    }
-
-    .coordinate-input::placeholder {
-        @apply text-green-500;
-        opacity: 0.5;
+      @apply text-sm;
+      min-height: 36px;
     }
 
     .initialize-button {
-        @apply w-full bg-green-900 border border-green-500 text-green-500 font-mono rounded;
-        @apply hover:bg-green-500 hover:text-black transition-all;
-        @apply disabled:opacity-50 disabled:cursor-not-allowed;
-        @apply font-bold flex items-center justify-center text-xs;
-        min-height: 36px;
-        animation: matrix-glow 2s ease-in-out infinite alternate;
+      @apply text-sm;
+      min-height: 40px;
     }
 
     .status-text {
-        @apply mt-3 text-xs break-words;
-        opacity: 0.6;
+      @apply text-sm;
     }
 
-    .status-error {
-        @apply text-red-400;
+    .weather-card,
+    .loading-card {
+      @apply p-6;
+      max-width: 28rem;
     }
 
-    /* Weather Display */
-    .weather-display {
-        @apply fixed inset-0 flex items-center justify-center z-30 p-4;
-        pointer-events: none;
-    }
-
-    .weather-card {
-        @apply w-full text-center p-4;
-        @apply bg-black border-2 rounded-xl font-mono;
-        backdrop-filter: blur(4px);
-        background-color: rgba(0, 0, 0, 0.9);
-        max-width: 90vw;
-        animation: matrix-glow 2s ease-in-out infinite alternate;
-    }
-
-    .weather-title {
-        @apply font-bold mb-4 tracking-wider text-lg;
-        text-shadow: 0 0 10px currentColor;
-        font-family: 'Courier New', monospace;
+    .weather-title,
+    .loading-title {
+      @apply text-xl;
     }
 
     .weather-location {
-        @apply mb-2 truncate text-sm;
-        opacity: 0.9;
+      @apply text-base;
     }
 
     .weather-temperature {
-        @apply font-bold my-4 text-3xl;
-        text-shadow: 0 0 20px currentColor;
-        font-family: 'Courier New', monospace;
+      @apply text-4xl;
     }
 
     .weather-description {
-        @apply mb-4 uppercase tracking-wide text-sm;
+      @apply text-base;
     }
 
     .weather-details {
-        @apply grid gap-3 text-xs;
-        grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
-        opacity: 0.8;
+      @apply text-sm grid-cols-3;
     }
 
     .weather-detail-item {
-        @apply flex justify-between;
+      @apply flex-col justify-center;
     }
+  }
 
-    .weather-detail-label {
-        @apply font-semibold;
-    }
-
-    .weather-effect-label {
-        @apply mt-4 text-xs;
-        opacity: 0.6;
-    }
-
-    /* Loading States */
-    .loading-display {
-        @apply fixed inset-0 flex items-center justify-center z-40 p-4;
-    }
-
+  @media (min-width: 768px) {
+    .weather-card,
     .loading-card {
-        @apply w-full text-center p-4;
-        @apply bg-black border-2 border-green-500 rounded-xl font-mono;
-        backdrop-filter: blur(4px);
-        background-color: rgba(0, 0, 0, 0.9);
-        max-width: 90vw;
-        animation: matrix-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+      @apply p-8;
     }
 
+    .weather-title,
     .loading-title {
-        @apply font-bold mb-3 tracking-wider text-xl text-green-500;
-        text-shadow: 0 0 10px currentColor;
-        font-family: 'Courier New', monospace;
+      @apply text-2xl mb-6;
     }
 
-    .loading-text {
-        @apply text-base text-green-500;
-        opacity: 0.8;
+    .weather-location {
+      @apply text-lg;
     }
 
-    /* Responsive Breakpoints */
-    @media (min-width: 640px) {
-        .gear-button {
-            width: 48px;
-            height: 48px;
-            font-size: 20px;
-        }
-
-        .setup-panel {
-            left: 72px;
-            width: 320px;
-            @apply p-4 text-sm;
-        }
-
-        .setup-button-group {
-            @apply flex-col gap-2 mb-3;
-        }
-
-        .setup-button {
-            @apply text-sm w-full;
-            min-height: 36px;
-            padding: 6px 12px;
-        }
-
-        .setup-input,
-        .coordinate-input {
-            @apply text-sm;
-            min-height: 36px;
-        }
-
-        .initialize-button {
-            @apply text-sm;
-            min-height: 40px;
-        }
-
-        .status-text {
-            @apply text-sm;
-        }
-
-        .weather-card,
-        .loading-card {
-            @apply p-6;
-            max-width: 28rem;
-        }
-
-        .weather-title,
-        .loading-title {
-            @apply text-xl;
-        }
-
-        .weather-location {
-            @apply text-base;
-        }
-
-        .weather-temperature {
-            @apply text-4xl;
-        }
-
-        .weather-description {
-            @apply text-base;
-        }
-
-        .weather-details {
-            @apply text-sm grid-cols-3;
-        }
-
-        .weather-detail-item {
-            @apply flex-col justify-center;
-        }
+    .weather-temperature {
+      @apply text-5xl my-6;
     }
 
-    @media (min-width: 768px) {
-        .weather-card,
-        .loading-card {
-            @apply p-8;
-        }
+    .weather-description {
+      @apply text-lg mb-6;
+    }
+  }
 
-        .weather-title,
-        .loading-title {
-            @apply text-2xl mb-6;
-        }
-
-        .weather-location {
-            @apply text-lg;
-        }
-
-        .weather-temperature {
-            @apply text-5xl my-6;
-        }
-
-        .weather-description {
-            @apply text-lg mb-6;
-        }
+  /* Mobile-specific hover states */
+  @media (hover: none) and (pointer: coarse) {
+    .matrix-button:active:not(:disabled),
+    .setup-button:active:not(:disabled),
+    .initialize-button:active:not(:disabled) {
+      @apply bg-green-500 text-black;
+      box-shadow: 0 0 15px rgba(0, 255, 0, 0.4);
     }
 
-    /* Mobile-specific hover states */
-    @media (hover: none) and (pointer: coarse) {
-        .matrix-button:active:not(:disabled),
-        .setup-button:active:not(:disabled),
-        .initialize-button:active:not(:disabled) {
-            @apply bg-green-500 text-black;
-            box-shadow: 0 0 15px rgba(0, 255, 0, 0.4);
-        }
-
-        .gear-button:active {
-            background-color: rgba(0, 17, 0, 1);
-            box-shadow: 0 0 30px rgba(0, 255, 0, 1);
-        }
+    .gear-button:active {
+      background-color: rgba(0, 17, 0, 1);
+      box-shadow: 0 0 30px rgba(0, 255, 0, 1);
     }
+  }
 }
 
 @layer utilities {
-    .backdrop-blur-matrix {
-        backdrop-filter: blur(4px);
-    }
+  .backdrop-blur-matrix {
+    backdrop-filter: blur(4px);
+  }
 
-    .text-shadow-glow {
-        text-shadow: 0 0 10px currentColor;
-    }
+  .text-shadow-glow {
+    text-shadow: 0 0 10px currentColor;
+  }
 
-    .animate-matrix-pulse {
-        animation: matrix-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-    }
+  .animate-matrix-pulse {
+    animation: matrix-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
 
-    .animate-matrix-glow {
-        animation: matrix-glow 2s ease-in-out infinite alternate;
-    }
+  .animate-matrix-glow {
+    animation: matrix-glow 2s ease-in-out infinite alternate;
+  }
 
-    /* Safe area utilities */
-    .safe-top {
-        padding-top: env(safe-area-inset-top);
-    }
+  /* Safe area utilities */
+  .safe-top {
+    padding-top: env(safe-area-inset-top);
+  }
 
-    .safe-bottom {
-        padding-bottom: env(safe-area-inset-bottom);
-    }
+  .safe-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
 
-    .safe-left {
-        padding-left: env(safe-area-inset-left);
-    }
+  .safe-left {
+    padding-left: env(safe-area-inset-left);
+  }
 
-    .safe-right {
-        padding-right: env(safe-area-inset-right);
-    }
+  .safe-right {
+    padding-right: env(safe-area-inset-right);
+  }
 }
 
 @keyframes matrix-pulse {
-    0%, 100% {
-        opacity: 0.5;
-    }
-    50% {
-        opacity: 1;
-    }
+  0%, 100% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 1;
+  }
 }
 
 @keyframes matrix-glow {
-    0% {
-        box-shadow: 0 0 5px rgba(0, 255, 0, 0.2);
-    }
-    100% {
-        box-shadow: 0 0 20px rgba(0, 255, 0, 0.6);
-    }
+  0% {
+    box-shadow: 0 0 5px rgba(0, 255, 0, 0.2);
+  }
+  100% {
+    box-shadow: 0 0 20px rgba(0, 255, 0, 0.6);
+  }
 }
 
 /* Accessibility */
 @media (prefers-reduced-motion: reduce) {
-    .animate-matrix-pulse,
-    .animate-matrix-glow,
-    .gear-button,
-    .setup-panel,
-    .initialize-button,
-    .loading-card,
-    .weather-card {
-        animation: none;
-    }
+  .animate-matrix-pulse,
+  .animate-matrix-glow,
+  .gear-button,
+  .setup-panel,
+  .initialize-button,
+  .loading-card,
+  .weather-card {
+    animation: none;
+  }
 
-    .matrix-button,
-    .matrix-input,
-    .setup-button,
-    .setup-input,
-    .coordinate-input,
-    .initialize-button {
-        transition: none;
-    }
+  .matrix-button,
+  .matrix-input,
+  .setup-button,
+  .setup-input,
+  .coordinate-input,
+  .initialize-button {
+    transition: none;
+  }
 }
 
 /* High contrast mode */
 @media (prefers-contrast: more) {
-    .matrix-text {
-        text-shadow: none;
-    }
+  .matrix-text {
+    text-shadow: none;
+  }
 
-    .matrix-panel,
-    .weather-card,
-    .loading-card,
-    .setup-panel {
-        backdrop-filter: none;
-        @apply bg-black border-2;
-        box-shadow: none;
-    }
+  .matrix-panel,
+  .weather-card,
+  .loading-card,
+  .setup-panel {
+    backdrop-filter: none;
+    @apply bg-black border-2;
+    box-shadow: none;
+  }
+}
+
+/* Add these styles to your existing index.css under the @layer components section */
+
+/* Connection Status Badge */
+.connection-status-badge {
+  @apply bg-black border rounded-lg font-mono p-3;
+  @apply flex items-center gap-3;
+  background-color: rgba(0, 0, 0, 0.9);
+  backdrop-filter: blur(4px);
+  min-width: 140px;
+  transition: all 0.3s ease-out;
+}
+
+.connection-status-badge.transitioning {
+  transform: scale(0.95);
+}
+
+.connection-status-badge-online {
+  @apply border-green-500;
+  box-shadow: 0 0 15px rgba(0, 255, 0, 0.2);
+}
+
+.connection-status-badge-offline {
+  @apply border-red-500;
+  box-shadow: 0 0 15px rgba(255, 0, 0, 0.2);
+}
+
+.connection-status-icon {
+  @apply text-lg flex-shrink-0;
+}
+
+.connection-status-icon-online {
+  @apply text-green-500;
+}
+
+.connection-status-icon-offline {
+  @apply text-red-500;
+  filter: brightness(0.8);
+}
+
+.connection-status-text {
+  @apply flex flex-col;
+}
+
+.connection-status-label {
+  @apply font-bold text-xs tracking-wider;
+}
+
+.connection-status-label-online {
+  @apply text-green-500;
+  text-shadow: 0 0 8px rgba(0, 255, 0, 0.4);
+}
+
+.connection-status-label-offline {
+  @apply text-red-500;
+  text-shadow: 0 0 8px rgba(255, 0, 0, 0.4);
+}
+
+.connection-status-description {
+  @apply text-xs mt-1;
+  opacity: 0.8;
+}
+
+.connection-status-description-online {
+  @apply text-green-400;
+}
+
+.connection-status-description-offline {
+  @apply text-red-400;
+}
+
+/* Responsive adjustments for mobile */
+@media (max-width: 640px) {
+  .connection-status-badge {
+    @apply p-2;
+    min-width: 120px;
+  }
+
+  .connection-status-icon {
+    @apply text-base;
+  }
+
+  .connection-status-label,
+  .connection-status-description {
+    @apply text-xs;
+  }
+}
+
+/* Accessibility - reduce animation for users who prefer reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .connection-status-badge-offline {
+    animation: none;
+  }
+
+  .connection-status-badge.transitioning {
+    transform: none;
+  }
 }

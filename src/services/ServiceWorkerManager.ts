@@ -1,5 +1,6 @@
 // src/services/ServiceWorkerManager.ts
 import { useNotificationStore } from '@/stores/notificationStore';
+import { logger } from './MatrixLogger';
 
 export class ServiceWorkerManager {
   private updateAvailable = false;
@@ -8,47 +9,78 @@ export class ServiceWorkerManager {
 
   async initialize() {
     if (!('serviceWorker' in navigator)) {
-      console.warn('⚠️ Service Workers not supported in this browser');
+      logger.warn('Service Workers not supported in this browser');
       this.showNotification('Service Workers not supported in this browser', 'warning');
       return;
     }
 
-    try {
-      // Register service worker
-      this.registration = await navigator.serviceWorker.register('/sw.js', {
-        scope: '/'
-      });
+    logger.group('Service Worker Initialization');
 
-      console.log('🚀 Matrix Weather Service Worker registered');
+    try {
+      // Register service worker - let VitePWA handle the path
+      this.registration = await navigator.serviceWorker.register(
+        import.meta.env.DEV ? '/dev-sw.js?dev-sw' : '/sw.js',
+        {
+          scope: '/',
+          type: 'classic'
+        }
+      );
+
+      logger.success('Matrix Weather Service Worker registered');
+      logger.debug(`Registration scope: ${this.registration.scope}`);
 
       // Set up event listeners
       this.setupEventListeners();
 
       // Check for existing updates
       if (this.registration.waiting) {
+        logger.info('Update already waiting, handling immediately');
         this.handleUpdate();
       }
 
-      // Start periodic update checks (every 5 minutes)
-      this.startPeriodicUpdateChecks();
+      // Start periodic update checks (every 5 minutes) - only in production
+      if (import.meta.env.PROD) {
+        this.startPeriodicUpdateChecks();
+        logger.debug('Periodic update checks enabled (production mode)');
+      } else {
+        logger.debug('Periodic update checks disabled (development mode)');
+      }
 
       // Show offline ready notification
       this.showNotification('Matrix Weather ready to work offline!', 'success');
 
     } catch (error) {
-      console.error('❌ Service Worker registration failed:', error);
+      logger.error('Service Worker registration failed', error);
+
+      // More specific error handling
+      if (error instanceof Error) {
+        if (error.message.includes('MIME type')) {
+          logger.warn('Service Worker MIME type issue - this is normal in development');
+          if (import.meta.env.DEV) {
+            this.showNotification('Service Worker disabled in development', 'info');
+            return;
+          }
+        }
+      }
+
       this.showNotification('Service Worker registration failed', 'error');
+    } finally {
+      logger.groupEnd();
     }
   }
 
   private setupEventListeners() {
     if (!this.registration) return;
 
+    logger.debug('Setting up Service Worker event listeners');
+
     // Listen for updates
     this.registration.addEventListener('updatefound', () => {
+      logger.info('Service Worker update found');
       const newWorker = this.registration?.installing;
       if (newWorker) {
         newWorker.addEventListener('statechange', () => {
+          logger.debug(`New worker state: ${newWorker.state}`);
           if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
             this.handleUpdate();
           }
@@ -69,11 +101,14 @@ export class ServiceWorkerManager {
   }
 
   private handleUpdate() {
+    logger.info('Handling Service Worker update');
     this.updateAvailable = true;
     this.showUpdatePrompt();
   }
 
   private showUpdatePrompt() {
+    logger.group('Update Prompt');
+
     // Show notification about update availability
     this.showNotification(
       'New Matrix Weather version available! Click to update.',
@@ -91,15 +126,20 @@ export class ServiceWorkerManager {
     );
 
     if (shouldUpdate) {
+      logger.info('User accepted update');
       this.applyUpdate();
     } else {
+      logger.info('User postponed update');
       this.showNotification('Update postponed. Refresh manually to update later.', 'info');
     }
+
+    logger.groupEnd();
   }
 
   private applyUpdate() {
     if (!this.registration?.waiting) return;
 
+    logger.info('Applying Matrix Weather update');
     this.showNotification('Applying Matrix Weather update...', 'info');
 
     // Tell the waiting service worker to skip waiting
@@ -107,6 +147,7 @@ export class ServiceWorkerManager {
 
     // Listen for the controlling change and reload
     navigator.serviceWorker.addEventListener('controllerchange', () => {
+      logger.success('Matrix Weather updated successfully - reloading');
       this.showNotification('Matrix Weather updated successfully!', 'success');
       setTimeout(() => {
         window.location.reload();
@@ -119,39 +160,43 @@ export class ServiceWorkerManager {
 
     try {
       await this.registration.update();
-      console.log('🔄 Checked for updates');
+      logger.debug('Update check completed');
     } catch (error) {
-      console.log('Update check failed:', error);
+      logger.warn('Update check failed', error);
     }
   }
 
   private startPeriodicUpdateChecks() {
     // Check for updates every 5 minutes
     this.checkInterval = setInterval(() => {
+      logger.debug('Running periodic update check');
       this.checkForUpdates();
     }, 5 * 60 * 1000);
+
+    logger.info('Periodic update checks started (5 minute interval)');
   }
 
   private stopPeriodicUpdateChecks() {
     if (this.checkInterval) {
       clearInterval(this.checkInterval);
       this.checkInterval = null;
+      logger.debug('Periodic update checks stopped');
     }
   }
 
   private handleOnline() {
-    console.log('🌐 Matrix Weather back online');
+    logger.success('Matrix Weather back online');
     this.showNotification('Connection restored - Matrix Weather back online', 'success');
   }
 
   private handleOffline() {
-    console.log('📡 Matrix Weather working offline');
+    logger.info('Matrix Weather working offline');
     this.showNotification('Working offline - Using cached data', 'info');
   }
 
   private handleBeforeInstallPrompt(e: Event) {
     e.preventDefault();
-    console.log('💾 Matrix Weather can be installed');
+    logger.info('Matrix Weather can be installed as PWA');
     this.showNotification('Matrix Weather can be installed as an app!', 'info', 6000);
 
     // Store the event for later use (could be used for custom install button)
@@ -159,7 +204,7 @@ export class ServiceWorkerManager {
   }
 
   private handleAppInstalled() {
-    console.log('🎉 Matrix Weather installed successfully');
+    logger.success('Matrix Weather PWA installed successfully');
     this.showNotification('Matrix Weather installed successfully!', 'success');
     (window as any).deferredInstallPrompt = null;
   }
@@ -167,16 +212,22 @@ export class ServiceWorkerManager {
   private handleServiceWorkerMessage(event: MessageEvent) {
     const { data } = event;
 
+    logger.group('Service Worker Message');
+    logger.debug(`Message type: ${data.type}`, data);
+
     switch (data.type) {
       case 'CACHE_UPDATED':
-        console.log(`Cache updated: ${data.payload.updatedURL}`);
+        logger.info(`Cache updated: ${data.payload.updatedURL}`);
         break;
       case 'OFFLINE_FALLBACK':
+        logger.warn('Using offline fallback');
         this.showNotification('Using cached weather data', 'info');
         break;
       default:
-        console.log('Service Worker message:', data);
+        logger.debug('Unknown service worker message', data);
     }
+
+    logger.groupEnd();
   }
 
   private showNotification(
@@ -188,50 +239,69 @@ export class ServiceWorkerManager {
     const { addNotification } = useNotificationStore.getState();
     addNotification(message, type, duration);
 
-    // Also log to console with Matrix-style formatting
-    const icons = {
-      success: '✅',
-      info: 'ℹ️',
-      warning: '⚠️',
-      error: '❌'
-    };
-    console.log(`${icons[type]} MATRIX SYSTEM: ${message}`);
+    // Log the notification with appropriate level
+    switch (type) {
+      case 'success':
+        logger.success(`Notification: ${message}`);
+        break;
+      case 'info':
+        logger.info(`Notification: ${message}`);
+        break;
+      case 'warning':
+        logger.warn(`Notification: ${message}`);
+        break;
+      case 'error':
+        logger.error(`Notification: ${message}`);
+        break;
+    }
   }
 
   // Public methods for external use
   public async manualUpdate() {
+    logger.info('Manual update check requested');
     await this.checkForUpdates();
   }
 
   public forceUpdate() {
     if (this.updateAvailable && this.registration?.waiting) {
+      logger.info('Force update requested');
       this.applyUpdate();
     } else {
+      logger.warn('Force update requested but no updates available');
       this.showNotification('No updates available', 'info');
     }
   }
 
   public getStatus() {
-    return {
+    const status = {
       updateAvailable: this.updateAvailable,
       registration: this.registration,
       isSupported: 'serviceWorker' in navigator
     };
+
+    logger.debug('Service Worker status requested', status);
+    return status;
   }
 
   public async unregister() {
     if (this.registration) {
+      logger.info('Unregistering Service Worker');
       this.stopPeriodicUpdateChecks();
       const success = await this.registration.unregister();
       if (success) {
+        logger.success('Service Worker unregistered successfully');
         this.showNotification('Service Worker unregistered', 'info');
+      } else {
+        logger.error('Failed to unregister Service Worker');
       }
       return success;
     }
+    logger.warn('No Service Worker registration to unregister');
     return false;
   }
 
   public destroy() {
+    logger.info('Destroying Service Worker Manager');
     this.stopPeriodicUpdateChecks();
 
     // Remove event listeners
@@ -242,6 +312,8 @@ export class ServiceWorkerManager {
 
     this.registration = null;
     this.updateAvailable = false;
+
+    logger.success('Service Worker Manager destroyed');
   }
 }
 
@@ -252,13 +324,13 @@ export const serviceWorkerManager = new ServiceWorkerManager();
 export const initializePWA = async () => {
   try {
     await serviceWorkerManager.initialize();
-    console.log('🚀 PWA initialized successfully');
+    logger.success('PWA initialized successfully');
 
     // Export for debugging in development
     if (import.meta.env.DEV) {
       (window as any).serviceWorkerManager = serviceWorkerManager;
     }
   } catch (error) {
-    console.error('❌ PWA initialization failed:', error);
+    logger.error('PWA initialization failed', error);
   }
 };
