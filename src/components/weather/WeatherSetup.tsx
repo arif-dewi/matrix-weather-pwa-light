@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useWeatherStore } from '@/stores/weatherStore';
-import { useWeather } from '@/hooks/useWeather';
+import { weatherService } from '@/services/WeatherService';
 import { env } from '@/config/env';
+import type { LocationData } from '@/types/weather';
 
 export function WeatherSetup() {
   const {
@@ -9,10 +10,13 @@ export function WeatherSetup() {
     location,
     isLoading,
     error,
-    setError
+    setError,
+    setLocation,
+    setWeatherData,
+    setLoading,
+    setApiKey
   } = useWeatherStore();
 
-  const { getCurrentLocationAndFetchWeather, fetchWeatherWithLocation } = useWeather();
   const [showSetup, setShowSetup] = useState(false);
   const [showManualLocation, setShowManualLocation] = useState(false);
   const [cityName, setCityName] = useState('');
@@ -51,6 +55,45 @@ export function WeatherSetup() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [showSetup, cityName, latitude, longitude, apiKey]);
 
+  const fetchWeatherData = async (
+    apiKey: string,
+    locationData: LocationData,
+    cityOverride?: string
+  ) => {
+    if (!weatherService.validateApiKey(apiKey)) {
+      throw new Error('Invalid API key format');
+    }
+
+    try {
+      let weatherData;
+
+      if (cityOverride?.trim()) {
+        weatherData = await weatherService.fetchWeatherByCity(cityOverride, apiKey);
+      } else {
+        weatherData = await weatherService.fetchWeatherByCoords(
+          locationData.latitude,
+          locationData.longitude,
+          apiKey
+        );
+      }
+
+      // Update location with actual coordinates from API response
+      const updatedLocation: LocationData = {
+        latitude: weatherData.coord.lat,
+        longitude: weatherData.coord.lon,
+        city: weatherData.name,
+        country: weatherData.sys.country
+      };
+
+      setLocation(updatedLocation);
+      setWeatherData(weatherData);
+      setApiKey(apiKey);
+
+      return weatherData;
+    } catch (error) {
+      throw error;
+    }
+  };
 
   const handleGetCurrentLocation = async () => {
     if (!apiKey.trim()) {
@@ -58,12 +101,20 @@ export function WeatherSetup() {
       return;
     }
 
+    setLoading(true);
+    setError(null);
     setStatus('Getting your location...');
+
     try {
-      await getCurrentLocationAndFetchWeather(apiKey);
+      const currentLocation = await weatherService.getCurrentLocation();
+      await fetchWeatherData(apiKey, currentLocation);
       setStatus('Weather matrix initialized!');
-    } catch (err) {
-      // Error is already handled in the hook
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Failed to get location';
+      setError(message);
+      setStatus(`Error: ${message}`);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -101,13 +152,20 @@ export function WeatherSetup() {
       return;
     }
 
+    setLoading(true);
+    setError(null);
     setStatus('Fetching weather data...');
+
     try {
-      await fetchWeatherWithLocation(apiKey, locationData, cityOverride);
+      await fetchWeatherData(apiKey, locationData, cityOverride);
       setStatus('Weather matrix initialized!');
       setShowSetup(false); // Hide setup after successful initialization
-    } catch (err) {
-      // Error is already handled in the hook
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Failed to fetch weather';
+      setError(message);
+      setStatus(`Error: ${message}`);
+    } finally {
+      setLoading(false);
     }
   };
 
