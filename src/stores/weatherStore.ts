@@ -33,7 +33,7 @@ interface WeatherState {
 
   // Actions
   setApiKey: (key: string) => void;
-  setLocation: (location: LocationData) => void;
+  setLocation: (location: LocationData | null) => void;
   setWeatherData: (data: WeatherData) => void;
   updateMatrixEffect: (weather: WeatherData) => void;
   updatePreferences: (preferences: Partial<WeatherPreferences>) => void;
