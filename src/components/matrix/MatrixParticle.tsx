@@ -190,7 +190,7 @@ export function MatrixParticle({ character, position, effectType }: MatrixPartic
   }, [texture]);
 
   // Mobile-optimized scale - but keep particles visible
-  const scale = settings.symbolScale * (isMobile ? 2 : 2.0); // Removed mobile reduction
+  const scale = settings.symbolScale * (isMobile ? 1.5 : 2.0);
   const opacity = isMobile ? OPACITY.STRONG : MATRIX_CONFIG.OPACITY;
 
   return (

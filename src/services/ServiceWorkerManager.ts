@@ -78,6 +78,7 @@ export class ServiceWorkerManager {
     this.registration.addEventListener('updatefound', () => {
       logger.info('Service Worker update found');
       const newWorker = this.registration?.installing;
+
       if (newWorker) {
         newWorker.addEventListener('statechange', () => {
           logger.debug(`New worker state: ${newWorker.state}`);

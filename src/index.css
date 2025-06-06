@@ -221,6 +221,7 @@
 
   .weather-detail-item {
     @apply flex justify-between;
+    flex-direction: column;
   }
 
   .weather-detail-label {
