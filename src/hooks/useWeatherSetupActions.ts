@@ -1,7 +1,7 @@
 // src/hooks/useWeatherSetupActions.ts
 import { useCallback } from 'react';
 import type { LocationData } from '@/types/weather';
-import { WeatherSetupLogicReturn } from "@/hooks/useWeatherSetupLogic.ts";
+import { WeatherSetupLogicReturn } from "@/hooks/useWeatherSetupLogic";
 
 export const useWeatherSetupActions = (logic: WeatherSetupLogicReturn) => {
   const {
@@ -9,7 +9,6 @@ export const useWeatherSetupActions = (logic: WeatherSetupLogicReturn) => {
     apiKey,
     location,
     processFlags,
-    locationQuery,
     cityWeatherQuery,
     weatherMutation,
     updateFormState,
@@ -17,6 +16,7 @@ export const useWeatherSetupActions = (logic: WeatherSetupLogicReturn) => {
     setWeatherData,
     getWeatherFromCache,
     notifications,
+    triggerLocationQuery,
   } = logic;
 
   const handleGetCurrentLocation = useCallback(async () => {
@@ -26,13 +26,23 @@ export const useWeatherSetupActions = (logic: WeatherSetupLogicReturn) => {
     }
 
     notifications.showInfo('Getting your location...');
-    processFlags.current.locationData = false;
-    locationQuery.refetch();
-  }, [apiKey, notifications, locationQuery.refetch]);
+
+    // **FIX: Use the trigger method to force location query**
+    try {
+      await triggerLocationQuery();
+    } catch (error) {
+      console.error('Location query failed:', error);
+    }
+  }, [apiKey, notifications, triggerLocationQuery]);
 
   const handleManualLocation = useCallback(() => {
+    // Reset flags when switching to manual mode
+    processFlags.current.locationData = false;
+    processFlags.current.autoWeather = false;
+    processFlags.current.cityWeather = false;
+
     updateFormState({ showManualLocation: true });
-  }, [updateFormState]);
+  }, [updateFormState, processFlags]);
 
   const handleFetchWeather = useCallback(async (locationOverride?: LocationData) => {
     if (!apiKey.trim()) {
@@ -53,7 +63,10 @@ export const useWeatherSetupActions = (logic: WeatherSetupLogicReturn) => {
       if (formState.cityName.trim()) {
         cityOverride = formState.cityName.trim();
         notifications.showInfo(`Searching weather for ${cityOverride}...`);
+
         processFlags.current.cityWeather = false;
+        processFlags.current.autoWeather = false;
+
         cityWeatherQuery.refetch();
         return;
       } else if (formState.latitude && formState.longitude) {
@@ -61,6 +74,10 @@ export const useWeatherSetupActions = (logic: WeatherSetupLogicReturn) => {
           latitude: parseFloat(formState.latitude),
           longitude: parseFloat(formState.longitude)
         };
+
+        processFlags.current.locationData = false;
+        processFlags.current.autoWeather = false;
+        processFlags.current.cityWeather = false;
       } else {
         notifications.showError('Please provide either a city name or coordinates');
         return;
@@ -84,6 +101,9 @@ export const useWeatherSetupActions = (logic: WeatherSetupLogicReturn) => {
     notifications.showInfo('Fetching weather data...');
 
     try {
+      processFlags.current.autoWeather = false;
+      processFlags.current.cityWeather = false;
+
       const result = await weatherMutation.mutateAsync({
         location: targetLocation,
         apiKey,
@@ -100,12 +120,33 @@ export const useWeatherSetupActions = (logic: WeatherSetupLogicReturn) => {
       setLocation(updatedLocation);
       setWeatherData(result);
       notifications.showSuccess('Weather matrix initialized!');
-      updateFormState({ showSetup: false, showManualLocation: false });
+      updateFormState({
+        showSetup: false,
+        showManualLocation: false,
+        cityName: '',
+        latitude: '',
+        longitude: ''
+      });
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Failed to fetch weather';
       notifications.showError(message);
+
+      processFlags.current.autoWeather = false;
+      processFlags.current.cityWeather = false;
     }
-  }, [apiKey, location, formState, weatherMutation, setLocation, setWeatherData, getWeatherFromCache, notifications, updateFormState]);
+  }, [
+    apiKey,
+    location,
+    formState,
+    weatherMutation,
+    setLocation,
+    setWeatherData,
+    getWeatherFromCache,
+    notifications,
+    updateFormState,
+    processFlags,
+    cityWeatherQuery
+  ]);
 
   return {
     handleGetCurrentLocation,

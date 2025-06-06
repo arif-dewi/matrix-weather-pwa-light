@@ -43,6 +43,8 @@ export interface WeatherSetupLogicReturn {
   autoWeatherQuery: ReturnType<typeof useWeatherByCoords>;
   cityWeatherQuery: ReturnType<typeof useWeatherByCity>;
   weatherMutation: ReturnType<typeof useWeatherMutation>;
+  triggerAutoWeather: () => void;
+  triggerLocationQuery: () => Promise<void>;
   updateFormState: (updates: Partial<SetupFormState>) => void;
   setLocation: (location: LocationData | null) => void;
   setWeatherData: (data: any) => void;
@@ -56,6 +58,9 @@ export const useWeatherSetupLogic = () => {
   const { getWeatherFromCache } = useWeatherCache();
   const [formState, setFormState] = useState<SetupFormState>(INITIAL_FORM_STATE);
 
+  // Add a trigger state to force re-enable queries
+  const [queryTrigger, setQueryTrigger] = useState(0);
+
   // Processing flags to prevent infinite loops
   const processFlags = useRef({
     autoWeather: false,
@@ -64,15 +69,23 @@ export const useWeatherSetupLogic = () => {
     matrixInitialized: false,
   });
 
-  // Query hooks
-  const locationQuery = useCurrentLocation(false);
+  // Add the trigger to the dependency array to force re-evaluation
+  const autoWeatherEnabled = Boolean(
+    apiKey &&
+    location?.latitude &&
+    location?.longitude &&
+    queryTrigger >= 0 // This will always be true but forces re-evaluation
+  );
+
+  // Query hooks - always create them but control enablement
+  const locationQuery = useCurrentLocation(false); // Always start disabled
   const weatherMutation = useWeatherMutation();
 
   const autoWeatherQuery = useWeatherByCoords(
     location?.latitude || null,
     location?.longitude || null,
     apiKey,
-    Boolean(apiKey && location?.latitude && location?.longitude)
+    autoWeatherEnabled
   );
 
   const cityWeatherQuery = useWeatherByCity(
@@ -86,7 +99,21 @@ export const useWeatherSetupLogic = () => {
     setFormState(prev => ({ ...prev, ...updates }));
   }, []);
 
-  return {
+  // Expose methods to force query re-evaluation
+  const triggerAutoWeather = useCallback(() => {
+    console.log('🔄 Triggering auto weather query');
+    processFlags.current.autoWeather = false;
+    setQueryTrigger(prev => prev + 1);
+  }, []);
+
+  const triggerLocationQuery = useCallback(() => {
+    console.log('📍 Triggering location query');
+    processFlags.current.locationData = false;
+    return locationQuery.refetch();
+  }, [locationQuery]);
+
+  // Attach trigger methods to the logic object
+  const logicWithTriggers = {
     // State
     formState,
     apiKey,
@@ -105,5 +132,11 @@ export const useWeatherSetupLogic = () => {
     setWeatherData,
     getWeatherFromCache,
     notifications,
+
+    // Trigger methods
+    triggerAutoWeather,
+    triggerLocationQuery,
   };
+
+  return logicWithTriggers;
 };
