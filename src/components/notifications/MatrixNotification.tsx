@@ -30,9 +30,7 @@ const COLOR = {
   error: MATRIX_COLORS.ERROR
 };
 
-
-
-function MatrixNotification({ notification, onRemove }: MatrixNotificationProps) {
+export function MatrixNotification({ notification, onRemove }: MatrixNotificationProps) {
   const [isVisible, setIsVisible] = useState(false);
 
   const color = COLOR[notification.type];
@@ -62,7 +60,7 @@ function MatrixNotification({ notification, onRemove }: MatrixNotificationProps)
 
   return (
     <div
-      className={`relative w-full max-w-sm cursor-pointer transition-transform duration-300 ease-out ${
+      className={`relative matrix-notification w-full max-w-sm cursor-pointer transition-transform duration-300 ease-out ${
         isVisible ? 'translate-x-0' : 'translate-x-full'
       }`}
       onClick={handleRemove}
@@ -83,29 +81,6 @@ function MatrixNotification({ notification, onRemove }: MatrixNotificationProps)
             {notification.message}
           </span>
         </div>
-      </div>
-    </div>
-  );
-}
-
-// Notification Container Component
-interface MatrixNotificationContainerProps {
-  notifications: NotificationData[];
-  onRemove: (id: string) => void;
-}
-
-export function MatrixNotificationContainer({ notifications, onRemove }: MatrixNotificationContainerProps) {
-  return (
-    <div className="fixed top-0 right-0 z-[10000] pointer-events-none">
-      <div className="flex flex-col gap-3 p-4">
-        {notifications.map((notification) => (
-          <div key={notification.id} className="pointer-events-auto">
-            <MatrixNotification
-              notification={notification}
-              onRemove={onRemove}
-            />
-          </div>
-        ))}
       </div>
     </div>
   );

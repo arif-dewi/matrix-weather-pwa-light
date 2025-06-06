@@ -1,74 +1,9 @@
-// src/components/weather/WeatherDisplay.tsx
-import { useMemo } from 'react';
 import { useWeatherDisplay, useWeatherPreferences, useLastFetchTime } from '@/stores/weatherStore';
 import { useWeatherByCoords } from '@/services/WeatherQueryService';
 import { WEATHER_VISUAL_SETTINGS } from '@/constants/matrix';
-import { formatDistanceToNow } from 'date-fns';
-
-interface WeatherDetailItemProps {
-  label: string;
-  value: string | number;
-  unit?: string;
-  icon?: string;
-}
-
-function WeatherDetailItem({ label, value, unit = '', icon }: WeatherDetailItemProps) {
-  return (
-    <div className="weather-detail-item">
-      <div className="weather-detail-label">
-        {icon && <span className="mr-1">{icon}</span>}
-        {label}
-      </div>
-      <div className="font-semibold">
-        {value}{unit}
-      </div>
-    </div>
-  );
-}
-
-function LoadingDisplay() {
-  return (
-    <div className="loading-display">
-      <div className="loading-card">
-        <div className="loading-title">WEATHER MATRIX</div>
-        <div className="loading-text">Initializing...</div>
-        <div className="loading-text">LOADING DATA STREAM</div>
-        <div className="flex justify-center mt-4">
-          <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-green-500"></div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function RefreshIndicator({ isRefetching, lastUpdate }: { isRefetching: boolean; lastUpdate: Date | null }) {
-  const timeAgo = useMemo(() => {
-    if (!lastUpdate) return null;
-    try {
-      return formatDistanceToNow(lastUpdate, { addSuffix: true });
-    } catch {
-      return null;
-    }
-  }, [lastUpdate]);
-
-  if (!timeAgo && !isRefetching) return null;
-
-  return (
-    <div className="weather-refresh-indicator mt-4 px-4">
-      <div className="flex items-center justify-center gap-2 text-xs opacity-60">
-        {isRefetching && (
-          <>
-            <div className="animate-spin rounded-full h-3 w-3 border-b border-current"></div>
-            <span>Updating...</span>
-          </>
-        )}
-        {!isRefetching && timeAgo && (
-          <span>Updated {timeAgo}</span>
-        )}
-      </div>
-    </div>
-  );
-}
+import { WeatherDetailItem } from './WeatherDetailItem';
+import { LoadingDisplay } from './LoadingDisplay';
+import { RefreshIndicator } from './RefreshIndicator';
 
 export function WeatherDisplay() {
   const { weatherData, matrixEffect, location } = useWeatherDisplay();
@@ -92,7 +27,7 @@ export function WeatherDisplay() {
 
   const settings = WEATHER_VISUAL_SETTINGS[matrixEffect];
 
-  // Show loading state
+
   if (!weatherData && !refreshError) {
     return null; // Setup component will handle initial loading
   }
@@ -155,15 +90,16 @@ export function WeatherDisplay() {
         </div>
 
         <div
-          className="weather-temperature"
+          className="weather-temperature text-4xl sm:text-6xl xs:text-6xl"
           style={{
             color: settings.color,
             textShadow: `0 0 20px ${settings.color}`
           }}
         >
           {Math.round(weatherData.main.temp)}°C
+
           {tempDiff !== 0 && (
-            <div className="text-sm opacity-75 mt-1">
+            <div className="text-base sm:text-lg opacity-75 mt-1">
               Feels like {feelsLikeTemp}°C
             </div>
           )}
@@ -186,21 +122,18 @@ export function WeatherDisplay() {
             value={weatherData.main.humidity}
             unit="%"
           />
-
           <WeatherDetailItem
             icon="💨"
             label="Wind"
             value={`${weatherData.wind.speed} m/s`}
             unit={windDirection ? ` ${getWindDirection(windDirection)}` : ''}
           />
-
           <WeatherDetailItem
             icon="📊"
             label="Pressure"
             value={`${weatherData.main.pressure} ${getPressureTrend(weatherData.main.pressure)}`}
             unit=" hPa"
           />
-
           {visibility && (
             <WeatherDetailItem
               icon="👁"
@@ -209,13 +142,11 @@ export function WeatherDisplay() {
               unit=" km"
             />
           )}
-
           <WeatherDetailItem
             icon="🌡"
             label="Range"
             value={`${Math.round(weatherData.main.temp_min)}° - ${Math.round(weatherData.main.temp_max)}°`}
           />
-
           <WeatherDetailItem
             icon="⚡"
             label="Effect"
@@ -228,13 +159,6 @@ export function WeatherDisplay() {
           isRefetching={isRefetching}
           lastUpdate={lastFetchTime}
         />
-
-        {/* Error indicator */}
-        {refreshError && (
-          <div className="mt-3 text-xs text-red-400 text-center opacity-75">
-            Auto-refresh failed: {refreshError.message}
-          </div>
-        )}
       </div>
     </div>
   );

@@ -96,7 +96,7 @@ export function WeatherSetup() {
     }
   }, [env.apiKey, location, autoWeatherData, isAutoWeatherLoading, autoWeatherError, notifications, updateFormState]);
 
-  // Handle successful auto weather fetch - FIXED
+  // Handle successful auto weather fetch
   useEffect(() => {
     if (autoWeatherData && !hasProcessedAutoWeather.current) {
       hasProcessedAutoWeather.current = true;
@@ -127,7 +127,7 @@ export function WeatherSetup() {
     }
   }, [autoWeatherError, notifications, updateFormState]);
 
-  // Handle successful location fetch - FIXED
+  // Handle successful location fetch
   useEffect(() => {
     if (currentLocationData && !hasProcessedLocationData.current) {
       hasProcessedLocationData.current = true;
@@ -156,7 +156,7 @@ export function WeatherSetup() {
     }
   }, [locationError, notifications]);
 
-  // Handle successful city weather fetch - FIXED
+  // Handle successful city weather fetch
   useEffect(() => {
     if (cityWeatherData && !hasProcessedCityWeather.current) {
       hasProcessedCityWeather.current = true;

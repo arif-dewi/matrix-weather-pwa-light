@@ -1,185 +1,113 @@
 // src/services/WeatherQueryService.ts
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import type { WeatherData, LocationData } from '@/types/weather';
 import { weatherService } from './WeatherService';
+import type { WeatherData, LocationData } from '@/types/weather';
 
-// Query Keys Factory Pattern
-export const weatherQueryKeys = {
+const STALE_TIME = 5 * 60 * 1000;
+const GC_TIME = 15 * 60 * 1000;
+
+export const weatherKeys = {
   all: ['weather'] as const,
-  current: () => [...weatherQueryKeys.all, 'current'] as const,
-  byCoords: (lat: number, lon: number) => [...weatherQueryKeys.current(), 'coords', lat, lon] as const,
-  byCity: (city: string) => [...weatherQueryKeys.current(), 'city', city] as const,
-  location: () => ['location'] as const,
-} as const;
+  location: () => [...weatherKeys.all, 'location'] as const,
+  coords: (lat: number, lon: number) => [...weatherKeys.all, 'coords', lat, lon] as const,
+  city: (city: string) => [...weatherKeys.all, 'city', city] as const,
+};
 
-// Custom Hook for Weather by Coordinates
-export const useWeatherByCoords = (
-  lat: number | null,
-  lon: number | null,
-  apiKey: string,
-  options?: {
+// Generic hook
+const createWeatherQuery = <T>(
+  key: any[],
+  fetchFn: () => Promise<T>,
+  options: {
     enabled?: boolean;
     staleTime?: number;
     refetchInterval?: number | false;
-  }
+    retry?: boolean | ((count: number, error: unknown) => boolean);
+  } = {}
 ) => {
   return useQuery({
-    queryKey: lat && lon ? weatherQueryKeys.byCoords(lat, lon) : [],
-    queryFn: async (): Promise<WeatherData> => {
+    queryKey: key,
+    queryFn: fetchFn,
+    enabled: options.enabled !== false,
+    staleTime: options.staleTime ?? STALE_TIME,
+    refetchInterval: options.refetchInterval ?? false,
+    retry: options.retry ?? false,
+    retryDelay: (attempt) => Math.min(1000 * 2 ** attempt, 30000),
+    gcTime: GC_TIME,
+  });
+};
+
+export const useWeatherByCoords = (lat: number | null, lon: number | null, apiKey: string, options?: any) => {
+  return createWeatherQuery(
+    lat && lon ? [...weatherKeys.coords(lat, lon)] : [],
+    async () => {
       if (!lat || !lon) throw new Error('Coordinates are required');
-      if (!weatherService.validateApiKey(apiKey)) {
-        throw new Error('Invalid API key format');
-      }
+      if (!weatherService.validateApiKey(apiKey)) throw new Error('Invalid API key');
       return weatherService.fetchWeatherByCoords(lat, lon, apiKey);
     },
-    enabled: Boolean(lat && lon && apiKey && options?.enabled !== false),
-    staleTime: options?.staleTime ?? 5 * 60 * 1000, // 5 minutes
-    refetchInterval: options?.refetchInterval ?? 10 * 60 * 1000, // 10 minutes
-    retry: (failureCount, error) => {
-      // Don't retry on authentication errors
-      if (error instanceof Error && error.message.includes('401')) {
-        return false;
-      }
-      return failureCount < 3;
-    },
-    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
-    gcTime: 15 * 60 * 1000, // 15 minutes cache
-    meta: {
-      errorMessage: 'Failed to fetch weather data by coordinates',
-    },
-  });
+    { ...options, enabled: Boolean(lat && lon && apiKey) }
+  );
 };
 
-// Custom Hook for Weather by City
-export const useWeatherByCity = (
-  city: string,
-  apiKey: string,
-  options?: {
-    enabled?: boolean;
-    staleTime?: number;
-  }
-) => {
-  return useQuery({
-    queryKey: city ? weatherQueryKeys.byCity(city) : [],
-    queryFn: async (): Promise<WeatherData> => {
-      if (!city.trim()) throw new Error('City name is required');
-      if (!weatherService.validateApiKey(apiKey)) {
-        throw new Error('Invalid API key format');
-      }
+export const useWeatherByCity = (city: string, apiKey: string, options?: any) => {
+  return createWeatherQuery(
+    city ? [...weatherKeys.city(city)] : [],
+    async () => {
+      if (!city.trim()) throw new Error('City name required');
+      if (!weatherService.validateApiKey(apiKey)) throw new Error('Invalid API key');
       return weatherService.fetchWeatherByCity(city, apiKey);
     },
-    enabled: Boolean(city && apiKey && options?.enabled !== false),
-    staleTime: options?.staleTime ?? 5 * 60 * 1000,
-    retry: false,
-    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
-    gcTime: 15 * 60 * 1000,
-    meta: {
-      errorMessage: 'Failed to fetch weather data by city',
-    },
-  });
+    { ...options, enabled: Boolean(city && apiKey) }
+  );
 };
 
-// Custom Hook for Current Location
 export const useCurrentLocation = (options?: { enabled?: boolean }) => {
-  return useQuery({
-    queryKey: weatherQueryKeys.location(),
-    queryFn: async (): Promise<LocationData> => {
-      return weatherService.getCurrentLocation();
-    },
-    enabled: options?.enabled !== false,
-    staleTime: 30 * 60 * 1000, // 30 minutes - location doesn't change often
-    retry: false, // Don't retry location requests
-    gcTime: 60 * 60 * 1000, // 1 hour cache
-    meta: {
-      errorMessage: 'Failed to get current location',
-    },
-  });
+  return createWeatherQuery(
+    [...weatherKeys.location()],
+    () => weatherService.getCurrentLocation(),
+    { staleTime: 30 * 60 * 1000, retry: false, ...options }
+  );
 };
 
-// Mutation for Fetching Weather (for manual triggers)
 export const useWeatherMutation = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: async ({
-       location,
-       apiKey,
-       cityOverride,
+      location,
+      apiKey,
+      cityOverride,
     }: {
       location: LocationData;
       apiKey: string;
       cityOverride?: string;
     }): Promise<WeatherData> => {
-      if (!weatherService.validateApiKey(apiKey)) {
-        throw new Error('Invalid API key format');
-      }
-
-      if (cityOverride?.trim()) {
-        return weatherService.fetchWeatherByCity(cityOverride, apiKey);
-      } else {
-        return weatherService.fetchWeatherByCoords(
-          location.latitude,
-          location.longitude,
-          apiKey
-        );
-      }
+      if (!weatherService.validateApiKey(apiKey)) throw new Error('Invalid API key');
+      return cityOverride
+        ? weatherService.fetchWeatherByCity(cityOverride, apiKey)
+        : weatherService.fetchWeatherByCoords(location.latitude, location.longitude, apiKey);
     },
-    onSuccess: (data, variables) => {
-      // Update relevant caches
-      const { location, cityOverride } = variables;
-
+    onSuccess: (data, { location, cityOverride }) => {
       if (cityOverride) {
-        queryClient.setQueryData(
-          weatherQueryKeys.byCity(cityOverride),
-          data
-        );
+        queryClient.setQueryData(weatherKeys.city(cityOverride), data);
       } else {
-        queryClient.setQueryData(
-          weatherQueryKeys.byCoords(location.latitude, location.longitude),
-          data
-        );
+        queryClient.setQueryData(weatherKeys.coords(location.latitude, location.longitude), data);
       }
 
-      // Invalidate all weather queries to ensure consistency
       queryClient.invalidateQueries({
-        queryKey: weatherQueryKeys.all,
-        refetchType: 'none', // Don't refetch, just mark as stale
+        queryKey: weatherKeys.all,
+        refetchType: 'none',
       });
-    },
-    meta: {
-      errorMessage: 'Failed to fetch weather data',
     },
   });
 };
 
-// Utility Hook for Weather Cache Management
 export const useWeatherCache = () => {
   const queryClient = useQueryClient();
 
-  const clearWeatherCache = () => {
-    queryClient.removeQueries({
-      queryKey: weatherQueryKeys.all,
-    });
-  };
-
-  const invalidateWeatherCache = () => {
-    queryClient.invalidateQueries({
-      queryKey: weatherQueryKeys.all,
-    });
-  };
-
-  const getWeatherFromCache = (lat: number, lon: number): WeatherData | undefined => {
-    return queryClient.getQueryData(weatherQueryKeys.byCoords(lat, lon));
-  };
-
-  const getCityWeatherFromCache = (city: string): WeatherData | undefined => {
-    return queryClient.getQueryData(weatherQueryKeys.byCity(city));
-  };
-
   return {
-    clearWeatherCache,
-    invalidateWeatherCache,
-    getWeatherFromCache,
-    getCityWeatherFromCache,
+    clear: () => queryClient.removeQueries({ queryKey: weatherKeys.all }),
+    invalidate: () => queryClient.invalidateQueries({ queryKey: weatherKeys.all }),
+    getByCoords: (lat: number, lon: number) => queryClient.getQueryData<WeatherData>(weatherKeys.coords(lat, lon)),
+    getByCity: (city: string) => queryClient.getQueryData<WeatherData>(weatherKeys.city(city)),
   };
 };
