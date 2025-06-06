@@ -99,7 +99,6 @@ export function updateParticlePosition(
   }
 }
 
-
 export function getParticleCount(effectType: MatrixEffectType, tier: PerformanceTier): number {
   const base = {
     [PerformanceTier.LOW]: PARTICLE_COUNTS.LOW_END,

@@ -3,12 +3,11 @@ import { MatrixParticle } from './MatrixParticle';
 import { MATRIX_CHARS } from '@/constants/matrix';
 import { MOVEMENT_BOUNDS } from '@/constants/weather';
 import { MatrixEffectType } from '@/types/weather';
-import { isMobileDevice } from '@/utils/device';
-import { usePerformanceOptimization } from '@/hooks/usePerformanceOptimization';
+import {getPerformanceTier, isMobileDevice} from '@/utils/device';
 import { getRandomPosition, getParticleCount } from './helper';
 
 export function MatrixField({ effectType }: { effectType: MatrixEffectType }) {
-  const { performanceTier } = usePerformanceOptimization();
+  const performanceTier = getPerformanceTier();
   const isMobile = useMemo(() => isMobileDevice(), []);
 
   const particles = useMemo(() => {

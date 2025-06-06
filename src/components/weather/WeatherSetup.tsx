@@ -1,6 +1,6 @@
 // src/components/weather/WeatherSetup.tsx
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { useWeatherSetup, useWeatherPreferences } from '@/stores/weatherStore';
+import { useWeatherSetup } from '@/stores/weatherStore';
 import {
   useCurrentLocation,
   useWeatherMutation,
@@ -32,7 +32,6 @@ const INITIAL_FORM_STATE: SetupFormState = {
 
 export function WeatherSetup() {
   const { apiKey, location, setLocation, setWeatherData } = useWeatherSetup();
-  const preferences = useWeatherPreferences();
   const notifications = useMatrixNotifications();
   const { getWeatherFromCache } = useWeatherCache();
   const [formState, setFormState] = useState<SetupFormState>(INITIAL_FORM_STATE);
@@ -43,17 +42,16 @@ export function WeatherSetup() {
   const hasProcessedLocationData = useRef(false);
   const hasProcessedCityWeather = useRef(false);
 
-  // TanStack Query hooks
   const {
     data: currentLocationData,
     isLoading: isLocationLoading,
     error: locationError,
     refetch: refetchLocation,
-  } = useCurrentLocation({ enabled: false });
+  } = useCurrentLocation(false);
 
   const weatherMutation = useWeatherMutation();
 
-  // Auto-query weather if we have coordinates and API key
+  // Auto-fetch weather by current location
   const {
     data: autoWeatherData,
     isLoading: isAutoWeatherLoading,
@@ -62,11 +60,7 @@ export function WeatherSetup() {
     location?.latitude || null,
     location?.longitude || null,
     apiKey,
-    {
-      enabled: Boolean(apiKey && location?.latitude && location?.longitude),
-      staleTime: preferences.refreshInterval * 60 * 1000,
-      refetchInterval: preferences.autoRefresh ? preferences.refreshInterval * 60 * 1000 : false,
-    }
+    Boolean(apiKey && location?.latitude && location?.longitude)
   );
 
   // Manual city query
@@ -78,7 +72,7 @@ export function WeatherSetup() {
   } = useWeatherByCity(
     formState.cityName,
     apiKey,
-    { enabled: false } // Only trigger manually
+    false // Only trigger manually
   );
 
   // Update form state helper
@@ -151,7 +145,7 @@ export function WeatherSetup() {
   // Handle location errors
   useEffect(() => {
     if (locationError) {
-      const errorMessage = locationError instanceof Error ? locationError.message : 'Failed to get location';
+      const errorMessage = locationError.message || 'Failed to get location';
       notifications.showError(errorMessage);
     }
   }, [locationError, notifications]);

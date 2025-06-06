@@ -1,4 +1,4 @@
-import { useWeatherDisplay, useWeatherPreferences, useLastFetchTime } from '@/stores/weatherStore';
+import { useWeatherDisplay, useWeatherPreferences, useLastFetchTime, useApiKey } from '@/stores/weatherStore';
 import { useWeatherByCoords } from '@/services/WeatherQueryService';
 import { WEATHER_VISUAL_SETTINGS } from '@/constants/matrix';
 import { WeatherDetailItem } from './WeatherDetailItem';
@@ -6,9 +6,10 @@ import { LoadingDisplay } from './LoadingDisplay';
 import { RefreshIndicator } from './RefreshIndicator';
 
 export function WeatherDisplay() {
-  const { weatherData, matrixEffect, location } = useWeatherDisplay();
+  const {weatherData, matrixEffect, location} = useWeatherDisplay();
   const preferences = useWeatherPreferences();
   const lastFetchTime = useLastFetchTime();
+  const apiKey = useApiKey();
 
   // Auto-refresh weather data based on preferences
   const {
@@ -17,23 +18,18 @@ export function WeatherDisplay() {
   } = useWeatherByCoords(
     location?.latitude || null,
     location?.longitude || null,
-    '', // API key will be handled by the store
-    {
-      enabled: Boolean(weatherData && preferences.autoRefresh),
-      staleTime: preferences.refreshInterval * 60 * 1000,
-      refetchInterval: preferences.autoRefresh ? preferences.refreshInterval * 60 * 1000 : false,
-    }
+    apiKey,
+    Boolean(weatherData && preferences.autoRefresh && apiKey)
   );
 
   const settings = WEATHER_VISUAL_SETTINGS[matrixEffect];
-
 
   if (!weatherData && !refreshError) {
     return null; // Setup component will handle initial loading
   }
 
   if (!weatherData) {
-    return <LoadingDisplay />;
+    return <LoadingDisplay/>;
   }
 
   // Calculate additional weather metrics
@@ -83,7 +79,7 @@ export function WeatherDisplay() {
 
         <div
           className="weather-location"
-          style={{ color: settings.color }}
+          style={{color: settings.color}}
           title={`${weatherData.name}, ${weatherData.sys.country} (${weatherData.coord.lat.toFixed(2)}, ${weatherData.coord.lon.toFixed(2)})`}
         >
           {weatherData.name}, {weatherData.sys.country}
@@ -107,14 +103,14 @@ export function WeatherDisplay() {
 
         <div
           className="weather-description"
-          style={{ color: settings.color }}
+          style={{color: settings.color}}
         >
           {weatherData.weather[0].description.toUpperCase()}
         </div>
 
         <div
           className="weather-details"
-          style={{ color: settings.color }}
+          style={{color: settings.color}}
         >
           <WeatherDetailItem
             icon="💧"
@@ -154,12 +150,11 @@ export function WeatherDisplay() {
           />
         </div>
 
-        {/* Refresh indicator */}
         <RefreshIndicator
           isRefetching={isRefetching}
           lastUpdate={lastFetchTime}
         />
       </div>
     </div>
-  );
-}
+  )
+};

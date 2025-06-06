@@ -3,25 +3,49 @@ import { Canvas } from '@react-three/fiber';
 import { useWeatherStore } from '@/stores/weatherStore';
 
 import { PerformanceTier } from '@/types/weather';
-import { isMobileDevice } from '@/utils/device';
-import { usePerformanceOptimization } from '@/hooks/usePerformanceOptimization';
+import {getPerformanceTier, isMobileDevice} from '@/utils/device';
 import { MatrixField } from './MatrixField';
 import { LoadingFallback } from '@/components/shared/LoadingFallback';
+
+const CAMERA = {
+  POSITION: {
+    DESKTOP: [0, 0, 20],
+    MOBILE: {
+      PORTRAIT: [0, 0, 25],
+      LANDSCAPE: [0, 0, 18]
+    }
+  },
+  FOV: {
+    DESKTOP: 75,
+    MOBILE: {
+      PORTRAIT: 85,
+      LANDSCAPE: 65
+    },
+  },
+  NEAR: {
+    DESKTOP: 0.1,
+    MOBILE: 0.1,
+  },
+  FAR: {
+    DESKTOP: 1000,
+    MOBILE: 1000,
+  }
+}
 
 export function MatrixScene() {
   const { weatherData } = useWeatherStore();
   const matrixEffect = useWeatherStore((s) => s.matrixEffect);
-  const { performanceTier } = usePerformanceOptimization();
+  const performanceTier = getPerformanceTier();
   const isMobile = isMobileDevice();
 
   // Canvas settings optimized for different performance tiers
   const canvasSettings = useMemo(() => {
     const baseSettings = {
       camera: {
-        position: [0, 0, 20] as [number, number, number],
-        fov: 75,
-        near: 0.1,
-        far: 1000
+        position: CAMERA.POSITION.DESKTOP as [number, number, number],
+        fov: CAMERA.FOV.DESKTOP,
+        near: CAMERA.NEAR.DESKTOP,
+        far: CAMERA.FAR.DESKTOP
       },
       gl: {
         alpha: true,
@@ -36,8 +60,8 @@ export function MatrixScene() {
     // Adjust camera for mobile aspect ratios
     if (isMobile) {
       const isPortrait = window.innerHeight > window.innerWidth;
-      baseSettings.camera.fov = isPortrait ? 85 : 65;
-      baseSettings.camera.position = [0, 0, isPortrait ? 25 : 18];
+      baseSettings.camera.fov = isPortrait ? CAMERA.FOV.MOBILE.PORTRAIT : CAMERA.FOV.MOBILE.LANDSCAPE;
+      baseSettings.camera.position = CAMERA.POSITION.MOBILE[isPortrait ? 'PORTRAIT' : 'LANDSCAPE'] as [number, number, number];
     }
 
     return baseSettings;
