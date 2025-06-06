@@ -1,45 +1,57 @@
-import { useMemo } from 'react';
-import { MatrixParticle } from './MatrixParticle';
-import { MATRIX_CHARS } from '@/constants/matrix';
-import { MOVEMENT_BOUNDS } from '@/constants/weather';
-import { MatrixEffectType } from '@/types/weather';
+import { Suspense, useMemo } from 'react';
+import { Canvas } from '@react-three/fiber';
+import { useWeatherStore } from '@/stores/weatherStore';
+
+import { PerformanceTier } from '@/types/weather';
 import { isMobileDevice } from '@/utils/device';
 import { usePerformanceOptimization } from '@/hooks/usePerformanceOptimization';
-import { getRandomPosition, getParticleCount } from './helper';
+import { MatrixField } from './MatrixField';
+import { LoadingFallback } from '@/components/shared/LoadingFallback';
 
-export function MatrixScene({ effectType }: { effectType: MatrixEffectType }) {
+export function MatrixScene() {
+  const { weatherData } = useWeatherStore();
+  const matrixEffect = useWeatherStore((s) => s.matrixEffect);
   const { performanceTier } = usePerformanceOptimization();
-  const isMobile = useMemo(() => isMobileDevice(), []);
+  const isMobile = isMobileDevice();
 
-  const particles = useMemo(() => {
-    const chars = MATRIX_CHARS[effectType] ?? MATRIX_CHARS[MatrixEffectType.DEFAULT];
-    const count = getParticleCount(effectType, performanceTier);
-
-    const bounds = {
-      X: isMobile ? MOVEMENT_BOUNDS.X * MOVEMENT_BOUNDS.MOBILE_SCALE : MOVEMENT_BOUNDS.X,
-      Y_TOP: MOVEMENT_BOUNDS.Y_TOP,
-      Y_BOTTOM: MOVEMENT_BOUNDS.Y_BOTTOM,
-      Z: isMobile ? MOVEMENT_BOUNDS.Z * MOVEMENT_BOUNDS.Z_MOBILE_SCALE : MOVEMENT_BOUNDS.Z
+  // Canvas settings optimized for different performance tiers
+  const canvasSettings = useMemo(() => {
+    const baseSettings = {
+      camera: {
+        position: [0, 0, 20] as [number, number, number],
+        fov: 75,
+        near: 0.1,
+        far: 1000
+      },
+      gl: {
+        alpha: true,
+        antialias: performanceTier === PerformanceTier.HIGH,
+        powerPreference: performanceTier === PerformanceTier.HIGH ?
+          "high-performance" as const :
+          "low-power" as const
+      },
+      style: { background: 'transparent' }
     };
 
-    return Array.from({ length: count }, (_, i) => ({
-      id: `particle-${i}`,
-      character: chars[Math.floor(Math.random() * chars.length)],
-      position: getRandomPosition(bounds),
-      effectType
-    }));
-  }, [effectType, performanceTier, isMobile]);
+    // Adjust camera for mobile aspect ratios
+    if (isMobile) {
+      const isPortrait = window.innerHeight > window.innerWidth;
+      baseSettings.camera.fov = isPortrait ? 85 : 65;
+      baseSettings.camera.position = [0, 0, isPortrait ? 25 : 18];
+    }
+
+    return baseSettings;
+  }, [performanceTier, isMobile]);
+
+  if (!weatherData) return <LoadingFallback />;
 
   return (
-    <>
-      {particles.map((p) => (
-        <MatrixParticle
-          key={p.id}
-          character={p.character}
-          position={p.position}
-          effectType={p.effectType}
-        />
-      ))}
-    </>
+    <div className="fixed inset-0 w-full h-full z-10">
+      <Canvas {...canvasSettings}>
+        <Suspense fallback={null}>
+          <MatrixField effectType={matrixEffect} />
+        </Suspense>
+      </Canvas>
+    </div>
   );
 }

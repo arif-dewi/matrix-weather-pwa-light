@@ -168,7 +168,7 @@ font-family: 'Courier New', monospace
 ```
 src/components/
 ├── matrix/          # 3D Matrix components
-│   ├── MatrixScene.tsx
+│   ├── MatrixField.tsx
 │   └── MatrixParticle.tsx
 ├── weather/         # Weather-related components
 │   ├── WeatherDisplay.tsx
