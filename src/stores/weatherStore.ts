@@ -93,7 +93,9 @@ export const useWeatherStore = create<WeatherState>()(
           }));
         },
 
-        setLocation: (location: LocationData) => {
+        setLocation: (location: LocationData | null) => {
+          if (!location) return;
+
           set((state) => ({
             location,
             cache: {

@@ -55,24 +55,22 @@ export function WeatherSetup() {
                 className="setup-input"
                 disabled={isLoading}
               />
-              <div className="coordinate-inputs">
-                <input
-                  type="number"
-                  placeholder="Latitude"
-                  value={formState.latitude}
-                  onChange={(e) => updateFormState({ latitude: e.target.value })}
-                  className="coordinate-input"
-                  disabled={isLoading}
-                />
-                <input
-                  type="number"
-                  placeholder="Longitude"
-                  value={formState.longitude}
-                  onChange={(e) => updateFormState({ longitude: e.target.value })}
-                  className="coordinate-input"
-                  disabled={isLoading}
-                />
-              </div>
+              <input
+                type="number"
+                placeholder="Latitude"
+                value={formState.latitude}
+                onChange={(e) => updateFormState({ latitude: e.target.value })}
+                className="setup-input"
+                disabled={isLoading}
+              />
+              <input
+                type="number"
+                placeholder="Longitude"
+                value={formState.longitude}
+                onChange={(e) => updateFormState({ longitude: e.target.value })}
+                className="setup-input"
+                disabled={isLoading}
+              />
             </div>
           )}
 
