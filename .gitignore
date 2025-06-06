@@ -82,3 +82,5 @@ workbox-*.js.map
 .vite/
 ai/
 .idea/
+# Local Netlify folder
+.netlify
