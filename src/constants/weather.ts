@@ -1,193 +1,148 @@
-// Weather condition enums
-export enum WeatherCondition {
-  THUNDERSTORM = 'Thunderstorm',
-  DRIZZLE = 'Drizzle',
-  RAIN = 'Rain',
-  SNOW = 'Snow',
-  MIST = 'Mist',
-  SMOKE = 'Smoke',
-  HAZE = 'Haze',
-  DUST = 'Dust',
-  FOG = 'Fog',
-  SAND = 'Sand',
-  ASH = 'Ash',
-  SQUALL = 'Squall',
-  TORNADO = 'Tornado',
-  CLEAR = 'Clear',
-  CLOUDS = 'Clouds'
-}
+// src/constants/weather.ts (Updated - remove duplicate enums)
+import { MatrixEffectType, WeatherCondition } from '@/types/weather';
 
-export enum MatrixEffectType {
-  RAIN = 'rain',
-  SNOW = 'snow',
-  SUN = 'sun',
-  WIND = 'wind',
-  CLOUD = 'cloud',
-  STORM = 'storm',
-  FOG = 'fog',
-  DEFAULT = 'default'
-}
+// API Configuration
+export const API_VALIDATION = {
+  MIN_KEY_LENGTH: 32,
+  KEY_PATTERN: /^[a-f0-9]{32}$/i,
+  TIMEOUT_MS: 10000,
+  MAX_AGE_MS: 60000,
+  BASE_URL: 'https://api.openweathermap.org/data/2.5',
+} as const;
 
-// Performance tiers
-export enum PerformanceTier {
-  LOW = 'low',
-  MEDIUM = 'medium',
-  HIGH = 'high'
-}
+// Weather condition to matrix effect mapping
+export const WEATHER_TO_EFFECT_MAP: Record<WeatherCondition, MatrixEffectType> = {
+  'Clear': MatrixEffectType.SUN,
+  'Clouds': MatrixEffectType.CLOUD,
+  'Rain': MatrixEffectType.RAIN,
+  'Drizzle': MatrixEffectType.RAIN,
+  'Thunderstorm': MatrixEffectType.STORM,
+  'Snow': MatrixEffectType.SNOW,
+  'Mist': MatrixEffectType.FOG,
+  'Fog': MatrixEffectType.FOG,
+  'Haze': MatrixEffectType.FOG,
+  'Smoke': MatrixEffectType.FOG,
+  'Dust': MatrixEffectType.WIND,
+  'Sand': MatrixEffectType.WIND,
+  'Ash': MatrixEffectType.FOG,
+  'Squall': MatrixEffectType.STORM,
+  'Tornado': MatrixEffectType.STORM,
+} as const;
 
-// Device types
-export enum DeviceType {
-  MOBILE = 'mobile',
-  TABLET = 'tablet',
-  DESKTOP = 'desktop'
-}
+// Performance-based particle counts
+export const PARTICLE_COUNTS = {
+  BASE: 150,
+  MEDIUM: 100,
+  LOW_END: 75,
+  MOBILE_MAX: 50,
+} as const;
 
-// Animation constants
+// Effect-specific multipliers
+export const EFFECT_MULTIPLIERS: Record<MatrixEffectType, number> = {
+  [MatrixEffectType.DEFAULT]: 1.0,
+  [MatrixEffectType.SUN]: 0.8,
+  [MatrixEffectType.CLOUD]: 1.2,
+  [MatrixEffectType.WIND]: 1.1,
+  [MatrixEffectType.RAIN]: 1.5,
+  [MatrixEffectType.SNOW]: 1.3,
+  [MatrixEffectType.FOG]: 1.0,
+  [MatrixEffectType.STORM]: 1.8,
+} as const;
+
+// Animation speeds
 export const ANIMATION_SPEEDS = {
-  VERY_SLOW: 0.3,
+  VERY_SLOW: 0.2,
   SLOW: 0.5,
   NORMAL: 1.0,
-  FAST: 1.3,
+  FAST: 1.5,
   VERY_FAST: 2.0,
-  CHAOTIC: 2.5
+  CHAOTIC: 3.0,
 } as const;
 
-export const ANIMATION_DURATIONS = {
-  INSTANT: 0,
-  FAST: 150,
-  NORMAL: 300,
-  SLOW: 500,
-  VERY_SLOW: 1000
-} as const;
-
-// UI Dimensions
-export const UI_DIMENSIONS = {
-  TOUCH_TARGET_MIN: 44,
-  TOUCH_TARGET_COMFORTABLE: 48,
-  GEAR_ICON_SIZE: {
-    MOBILE: 40,
-    DESKTOP: 48
-  },
-  PANEL_WIDTH: {
-    MOBILE: 'calc(100vw - 5rem)',
-    DESKTOP: 320
-  },
-  PANEL_MAX_WIDTH: 384
-} as const;
-
-// Spacing
-export const SPACING = {
-  XS: 4,
-  SM: 8,
-  MD: 16,
-  LG: 24,
-  XL: 32,
-  XXL: 48
-} as const;
-
-// Breakpoints
-export const BREAKPOINTS = {
-  MOBILE_SMALL: 375,
-  MOBILE: 480,
-  TABLET: 640,
-  DESKTOP: 1024,
-  DESKTOP_LARGE: 1280
-} as const;
-
-// Matrix particle counts
-export const PARTICLE_COUNTS = {
-  LOW_END: 30,
-  MEDIUM: 50,
-  BASE: 90,
-  HIGH: 150,
-  MAXIMUM: 200
-} as const;
-
-// Matrix visual multipliers
-export const EFFECT_MULTIPLIERS = {
-  [MatrixEffectType.STORM]: 3.5,
-  [MatrixEffectType.RAIN]: 3.0,
-  [MatrixEffectType.SNOW]: 2.5,
-  [MatrixEffectType.WIND]: 2.5,
-  [MatrixEffectType.CLOUD]: 2.5,
-  [MatrixEffectType.FOG]: 2.2,
-  [MatrixEffectType.SUN]: 2.0,
-  [MatrixEffectType.DEFAULT]: 2.0
-} as const;
-
-// Canvas and texture settings
-export const CANVAS_SETTINGS = {
-  SIZE: {
-    DESKTOP: 256,
-    MOBILE: 256  // Increased from 128 to keep particles visible
-  },
-  FONT_SIZE: {
-    DESKTOP: 64,
-    MOBILE: 64   // Increased from 32 to keep particles readable
-  },
-  SCALE_FACTOR: {
-    MAX_DPI: 2,
-    DEFAULT: 1
-  }
-} as const;
-
-// Frame rate targets
-export const FRAME_RATES = {
-  DESKTOP: 60,
-  MOBILE_HIGH: 60,
-  MOBILE_LOW: 30,
-  UPDATE_INTERVAL_MS: {
-    HIGH_PERFORMANCE: 8.33,  // ~120fps max
-    NORMAL: 16.67,           // ~60fps
-    LOW_PERFORMANCE: 33.33   // ~30fps
-  }
-} as const;
-
-// Opacity values
-export const OPACITY = {
-  HIDDEN: 0,
-  BARELY_VISIBLE: 0.1,
-  SUBTLE: 0.3,
-  MEDIUM: 0.5,
-  VISIBLE: 0.7,
-  STRONG: 0.8,
-  ALMOST_OPAQUE: 0.9,
-  OPAQUE: 1.0
-} as const;
-
-// Movement bounds
+// Movement boundaries
 export const MOVEMENT_BOUNDS = {
   X: 40,
   Y_TOP: 15,
   Y_BOTTOM: -15,
   Z: 20,
   MOBILE_SCALE: 0.8,
-  Z_MOBILE_SCALE: 0.6
+  Z_MOBILE_SCALE: 0.6,
 } as const;
 
-// Weather effect mapping
-export const WEATHER_TO_EFFECT_MAP = {
-  [WeatherCondition.THUNDERSTORM]: MatrixEffectType.STORM,
-  [WeatherCondition.TORNADO]: MatrixEffectType.STORM,
-  [WeatherCondition.DRIZZLE]: MatrixEffectType.RAIN,
-  [WeatherCondition.RAIN]: MatrixEffectType.RAIN,
-  [WeatherCondition.SNOW]: MatrixEffectType.SNOW,
-  [WeatherCondition.CLEAR]: MatrixEffectType.SUN,
-  [WeatherCondition.CLOUDS]: MatrixEffectType.CLOUD,
-  [WeatherCondition.MIST]: MatrixEffectType.FOG,
-  [WeatherCondition.FOG]: MatrixEffectType.FOG,
-  [WeatherCondition.HAZE]: MatrixEffectType.FOG,
-  [WeatherCondition.SMOKE]: MatrixEffectType.FOG,
-  [WeatherCondition.DUST]: MatrixEffectType.FOG,
-  [WeatherCondition.SAND]: MatrixEffectType.FOG,
-  [WeatherCondition.ASH]: MatrixEffectType.FOG,
-  [WeatherCondition.SQUALL]: MatrixEffectType.WIND
+// Canvas settings
+export const CANVAS_SETTINGS = {
+  SIZE: {
+    DESKTOP: 256,
+    MOBILE: 128,
+  },
+  FONT_SIZE: {
+    DESKTOP: 64,
+    MOBILE: 48,
+  },
+  SCALE_FACTOR: {
+    DEFAULT: 1,
+    HIGH_DPI: 2,
+    MAX_DPI: 3,
+  },
 } as const;
 
-// API validation
-export const API_VALIDATION = {
-  MIN_KEY_LENGTH: 32,
-  KEY_PATTERN: /^[a-zA-Z0-9]+$/,
-  TIMEOUT_MS: 10000,
-  MAX_AGE_MS: 300000 // 5 minutes
+// Frame rate optimization
+export const FRAME_RATES = {
+  TARGET_FPS: 60,
+  UPDATE_INTERVAL_MS: {
+    HIGH_PERFORMANCE: 16, // 60fps
+    NORMAL: 33, // 30fps
+    LOW_PERFORMANCE: 50, // 20fps
+  },
+} as const;
+
+// Opacity settings
+export const OPACITY = {
+  STRONG: 0.9,
+  NORMAL: 0.7,
+  WEAK: 0.5,
+  MINIMAL: 0.3,
+} as const;
+
+// Query configuration
+export const QUERY_CONFIG = {
+  STALE_TIME: {
+    WEATHER: 5 * 60 * 1000, // 5 minutes
+    LOCATION: 30 * 60 * 1000, // 30 minutes
+  },
+  CACHE_TIME: {
+    WEATHER: 15 * 60 * 1000, // 15 minutes
+    LOCATION: 60 * 60 * 1000, // 1 hour
+  },
+  RETRY: {
+    ATTEMPTS: 3,
+    DELAY_MS: 1000,
+    MAX_DELAY_MS: 30000,
+  },
+  REFETCH_INTERVAL: {
+    ACTIVE: 10 * 60 * 1000, // 10 minutes
+    BACKGROUND: false,
+  },
+} as const;
+
+// Notification configuration
+export const NOTIFICATION_CONFIG = {
+  DURATION: {
+    SHORT: 3000,
+    NORMAL: 4000,
+    LONG: 6000,
+    PERSISTENT: 10000,
+  },
+  SLIDE_IN_DELAY: 10,
+  ANIMATION_DURATION: 300,
+} as const;
+
+// Matrix effect colors
+export const MATRIX_COLORS = {
+  DEFAULT: '#00ff00',
+  SUCCESS: '#00ff00',
+  WARNING: '#ffaa00',
+  ERROR: '#ff4444',
+  INFO: '#00aaff',
+  MUTED: '#888888',
 } as const;

@@ -1,3 +1,5 @@
+import { env } from '@/config/env';
+
 declare global {
   interface Window {
     workbox?: {
@@ -13,67 +15,94 @@ declare global {
   }
 }
 
+type Operation = 'debug' | 'info' | 'warn' | 'error' | 'success';
+type ConsoleFunction = 'debug' | 'log' | 'warn' | 'error';
+
+
+const emojiPrefixMap: Record<Operation, string> = {
+  debug: '🔍 MATRIX DEBUG:',
+  info: 'ℹ️ MATRIX INFO:',
+  warn: '⚠️ MATRIX WARNING:',
+  error: '❌ MATRIX ERROR:',
+  success: '✅ MATRIX SUCCESS:',
+};
+
+const workboxFnMap: Record<Operation, ConsoleFunction> = {
+  debug: 'debug',
+  info: 'log',
+  warn: 'warn',
+  error: 'error',
+  success: 'log',
+};
+
+const consoleFnMap: Record<Operation, ConsoleFunction> = {
+  debug: 'debug',
+  info: 'log',
+  warn: 'warn',
+  error: 'error',
+  success: 'log',
+};
+
 class MatrixLogger {
-  private workboxLogger = window.workbox?.logger;
+  private get logger() {
+    return window.workbox?.logger;
+  }
+
+  private log(operation: Operation, message: string, data?: any) {
+    const formatted = `${emojiPrefixMap[operation]} ${message}`;
+
+    const wbLogger = this.logger;
+    const wbFunction = wbLogger?.[workboxFnMap[operation]];
+    if (typeof wbFunction === 'function') {
+      wbFunction(formatted);
+      return;
+    }
+
+    if (env.isDevelopment) {
+      const consoleFn = console[consoleFnMap[operation]];
+      if (typeof consoleFn === 'function') {
+        consoleFn(formatted, data);
+      }
+    }
+  }
 
   debug(message: string, data?: any) {
-    const formatted = `🔍 MATRIX DEBUG: ${message}`;
-    if (this.workboxLogger) {
-      this.workboxLogger.debug(formatted);
-    } else {
-      console.debug(formatted, data);
-    }
+    this.log('debug', message, data);
   }
 
   info(message: string, data?: any) {
-    const formatted = `ℹ️ MATRIX INFO: ${message}`;
-    if (this.workboxLogger) {
-      this.workboxLogger.log(formatted);
-    } else {
-      console.log(formatted, data);
-    }
+    this.log('info', message, data);
   }
 
   warn(message: string, data?: any) {
-    const formatted = `⚠️ MATRIX WARNING: ${message}`;
-    if (this.workboxLogger) {
-      this.workboxLogger.warn(formatted);
-    } else {
-      console.warn(formatted, data);
-    }
+    this.log('warn', message, data);
   }
 
   error(message: string, data?: any) {
-    const formatted = `❌ MATRIX ERROR: ${message}`;
-    if (this.workboxLogger) {
-      this.workboxLogger.error(formatted);
-    } else {
-      console.error(formatted, data);
-    }
+    this.log('error', message, data);
   }
 
   success(message: string, data?: any) {
-    const formatted = `✅ MATRIX SUCCESS: ${message}`;
-    if (this.workboxLogger) {
-      this.workboxLogger.log(formatted);
-    } else {
-      console.log(formatted, data);
-    }
+    this.log('success', message, data);
   }
 
   group(title: string) {
     const formatted = `🚀 MATRIX GROUP: ${title}`;
-    if (this.workboxLogger) {
-      this.workboxLogger.groupCollapsed(formatted);
-    } else {
+    const wbGroup = this.logger?.groupCollapsed;
+
+    if (typeof wbGroup === 'function') {
+      wbGroup(formatted);
+    } else if (env.isDevelopment) {
       console.groupCollapsed(formatted);
     }
   }
 
   groupEnd() {
-    if (this.workboxLogger) {
-      this.workboxLogger.groupEnd();
-    } else {
+    const wbEnd = this.logger?.groupEnd;
+
+    if (typeof wbEnd === 'function') {
+      wbEnd();
+    } else if (env.isDevelopment) {
       console.groupEnd();
     }
   }

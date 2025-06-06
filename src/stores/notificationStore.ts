@@ -1,6 +1,7 @@
 // src/stores/notificationStore.ts
 import { create } from 'zustand';
 import type { NotificationData, NotificationType } from '@/components/notifications/MatrixNotification';
+import {NOTIFICATION_CONFIG} from "@/constants/weather.ts";
 
 interface NotificationState {
   notifications: NotificationData[];
@@ -9,12 +10,14 @@ interface NotificationState {
   clearAllNotifications: () => void;
 }
 
+const RADIX = 36;
+
 export const useNotificationStore = create<NotificationState>((set) => ({
   notifications: [],
 
-  addNotification: (message: string, type: NotificationType, duration = 4000) => {
+  addNotification: (message: string, type: NotificationType, duration = NOTIFICATION_CONFIG.DURATION.NORMAL) => {
     const notification: NotificationData = {
-      id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
+      id: Date.now().toString() + Math.random().toString(RADIX).substr(2, 9),
       message,
       type,
       duration

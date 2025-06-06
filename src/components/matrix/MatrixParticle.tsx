@@ -2,8 +2,8 @@ import { useRef, useMemo, useEffect } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { MATRIX_CONFIG, WEATHER_VISUAL_SETTINGS } from '@/constants/matrix';
+import { MatrixEffectType } from '@/types/weather';
 import {
-  MatrixEffectType,
   CANVAS_SETTINGS,
   FRAME_RATES,
   ANIMATION_SPEEDS,

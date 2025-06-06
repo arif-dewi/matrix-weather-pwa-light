@@ -4,18 +4,19 @@ import { MatrixParticle } from './MatrixParticle';
 import { useWeatherStore } from '@/stores/weatherStore';
 import { MATRIX_CHARS } from '@/constants/matrix';
 import {
-  MatrixEffectType,
-  PerformanceTier,
   PARTICLE_COUNTS,
   EFFECT_MULTIPLIERS,
   MOVEMENT_BOUNDS
 } from '@/constants/weather';
-import { getPerformanceTier, isMobileDevice } from '@/utils/device';
+import { MatrixEffectType, PerformanceTier } from '@/types/weather';
+import { isMobileDevice } from '@/utils/device';
+import { usePerformanceOptimization } from '@/hooks/usePerformanceOptimization';
 
 function MatrixField({ effectType }: { effectType: MatrixEffectType }) {
+  const { performanceTier } = usePerformanceOptimization();
+
   const particles = useMemo(() => {
     const chars = MATRIX_CHARS[effectType] || MATRIX_CHARS[MatrixEffectType.DEFAULT];
-    const performanceTier = getPerformanceTier();
 
     // Get base particle count based on performance
     let baseCount: number;
@@ -86,11 +87,13 @@ const LoadingFallback = () => (
 );
 
 export function MatrixScene() {
-  const { matrixEffect, isLoading, weatherData } = useWeatherStore();
-  const performanceTier = getPerformanceTier();
-  const isMobile = isMobileDevice();
+  const { weatherData } = useWeatherStore();
 
-  if (isLoading || !weatherData) return <LoadingFallback />;
+  if (!weatherData) return <LoadingFallback />;
+
+  const matrixEffect = useWeatherStore((s) => s.matrixEffect);
+  const { performanceTier } = usePerformanceOptimization();
+  const isMobile = isMobileDevice();
 
   // Canvas settings optimized for different performance tiers
   const canvasSettings = useMemo(() => {

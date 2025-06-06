@@ -1,4 +1,5 @@
-import { DeviceType, PerformanceTier, BREAKPOINTS } from '@/constants/weather';
+import { BREAKPOINTS, PERFORMANCE_THRESHOLDS } from '@/constants/device.ts';
+import { DeviceType, PerformanceTier } from '@/types/device.ts';
 
 /**
  * Device detection utilities using proper enums and constants
@@ -23,9 +24,9 @@ export const getPerformanceTier = (): PerformanceTier => {
   const hardwareConcurrency = navigator.hardwareConcurrency || 2;
   const deviceMemory = (navigator as any).deviceMemory || 4;
 
-  if (isMobile && (hardwareConcurrency <= 4 || deviceMemory <= 2)) {
+  if (isMobile && (hardwareConcurrency <= PERFORMANCE_THRESHOLDS.LOW_CORES || deviceMemory <= PERFORMANCE_THRESHOLDS.LOW_MEMORY)) {
     return PerformanceTier.LOW;
-  } else if (isMobile) {
+  } else if (isMobile || hardwareConcurrency <= PERFORMANCE_THRESHOLDS.HIGH_CORES) {
     return PerformanceTier.MEDIUM;
   }
   return PerformanceTier.HIGH;
@@ -33,4 +34,45 @@ export const getPerformanceTier = (): PerformanceTier => {
 
 export const getOptimalPixelRatio = (): number => {
   return Math.min(window.devicePixelRatio || 1, 2);
+};
+
+// Additional device capability detection
+export const getDeviceCapabilities = () => {
+  const deviceType = getDeviceType();
+  const performanceTier = getPerformanceTier();
+
+  return {
+    type: deviceType,
+    performanceTier,
+    pixelRatio: getOptimalPixelRatio(),
+    hardwareConcurrency: navigator.hardwareConcurrency || 2,
+    deviceMemory: (navigator as any).deviceMemory,
+    isMobile: isMobileDevice(),
+    isTouch: 'ontouchstart' in window,
+    supportsWebGL: (() => {
+      try {
+        const canvas = document.createElement('canvas');
+        return !!(canvas.getContext('webgl') || canvas.getContext('experimental-webgl'));
+      } catch {
+        return false;
+      }
+    })(),
+    supportsWebGL2: (() => {
+      try {
+        const canvas = document.createElement('canvas');
+        return !!canvas.getContext('webgl2');
+      } catch {
+        return false;
+      }
+    })(),
+    maxTextureSize: (() => {
+      try {
+        const canvas = document.createElement('canvas');
+        const gl = canvas.getContext('webgl');
+        return gl ? gl.getParameter(gl.MAX_TEXTURE_SIZE) : 2048;
+      } catch {
+        return 2048;
+      }
+    })(),
+  };
 };

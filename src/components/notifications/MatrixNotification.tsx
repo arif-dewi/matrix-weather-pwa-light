@@ -1,5 +1,6 @@
 // src/components/notifications/MatrixNotification.tsx
 import { useState, useEffect } from 'react';
+import {MATRIX_COLORS, NOTIFICATION_CONFIG} from "@/constants/weather.ts";
 
 export type NotificationType = 'success' | 'info' | 'warning' | 'error';
 
@@ -23,11 +24,13 @@ const ICON = {
 };
 
 const COLOR = {
-  success: '#00ff00',
-  info: '#00aaff',
-  warning: '#ffaa00',
-  error: '#ff4444'
+  success: MATRIX_COLORS.SUCCESS,
+  info: MATRIX_COLORS.INFO,
+  warning: MATRIX_COLORS.WARNING,
+  error: MATRIX_COLORS.ERROR
 };
+
+
 
 function MatrixNotification({ notification, onRemove }: MatrixNotificationProps) {
   const [isVisible, setIsVisible] = useState(false);
@@ -36,10 +39,10 @@ function MatrixNotification({ notification, onRemove }: MatrixNotificationProps)
 
   useEffect(() => {
     // Trigger slide-in animation
-    const timer = setTimeout(() => setIsVisible(true), 10);
+    const timer = setTimeout(() => setIsVisible(true), NOTIFICATION_CONFIG.SLIDE_IN_DELAY);
 
     // Auto-remove after duration
-    const duration = notification.duration || 4000;
+    const duration = notification.duration || NOTIFICATION_CONFIG.DURATION.NORMAL;
     const removeTimer = setTimeout(() => {
       handleRemove();
     }, duration);
@@ -54,12 +57,12 @@ function MatrixNotification({ notification, onRemove }: MatrixNotificationProps)
     setIsVisible(false);
     setTimeout(() => {
       onRemove(notification.id);
-    }, 300);
+    }, NOTIFICATION_CONFIG.ANIMATION_DURATION);
   };
 
   return (
     <div
-      className={`fixed top-4 right-4 z-[10000] max-w-sm cursor-pointer transition-transform duration-300 ease-out ${
+      className={`relative w-full max-w-sm cursor-pointer transition-transform duration-300 ease-out ${
         isVisible ? 'translate-x-0' : 'translate-x-full'
       }`}
       onClick={handleRemove}
@@ -94,13 +97,9 @@ interface MatrixNotificationContainerProps {
 export function MatrixNotificationContainer({ notifications, onRemove }: MatrixNotificationContainerProps) {
   return (
     <div className="fixed top-0 right-0 z-[10000] pointer-events-none">
-      <div className="flex flex-col gap-2 p-4">
-        {notifications.map((notification, index) => (
-          <div
-            key={notification.id}
-            className="pointer-events-auto"
-            style={{ marginTop: index * 60 }}
-          >
+      <div className="flex flex-col gap-3 p-4">
+        {notifications.map((notification) => (
+          <div key={notification.id} className="pointer-events-auto">
             <MatrixNotification
               notification={notification}
               onRemove={onRemove}

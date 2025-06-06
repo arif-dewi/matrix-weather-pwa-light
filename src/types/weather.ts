@@ -1,3 +1,4 @@
+// src/types/weather.ts
 export interface WeatherData {
   coord: {
     lon: number;
@@ -68,15 +69,22 @@ export type WeatherCondition =
   | 'Clear'
   | 'Clouds';
 
-export type MatrixEffectType =
-  | 'rain'
-  | 'snow'
-  | 'sun'
-  | 'wind'
-  | 'cloud'
-  | 'storm'
-  | 'fog'
-  | 'default';
+export enum MatrixEffectType {
+  RAIN = 'rain',
+  SNOW = 'snow',
+  SUN = 'sun',
+  WIND = 'wind',
+  CLOUD = 'cloud',
+  STORM = 'storm',
+  FOG = 'fog',
+  DEFAULT = 'default'
+}
+
+export enum PerformanceTier {
+  LOW = 'low',
+  MEDIUM = 'medium',
+  HIGH = 'high'
+}
 
 export interface LocationData {
   latitude: number;
