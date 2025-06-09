@@ -13,6 +13,7 @@ interface EnvironmentConfig {
   };
   isDevelopment: boolean;
   isProduction: boolean;
+  baseWeatherUrl: string;
 }
 
 function getOptionalEnvVar(key: string, defaultValue: string): string {
@@ -31,7 +32,8 @@ export const env: EnvironmentConfig = {
     version: getOptionalEnvVar('VITE_APP_VERSION', '1.0.0')
   },
   isDevelopment: import.meta.env.DEV,
-  isProduction: import.meta.env.PROD
+  isProduction: import.meta.env.PROD,
+  baseWeatherUrl: getOptionalEnvVar('VITE_BASE_WEATHER_URL', 'https://api.openweathermap.org/data/2.5')
 };
 
 // Validation

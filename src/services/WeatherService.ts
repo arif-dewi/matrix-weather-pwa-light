@@ -1,15 +1,14 @@
 import type { WeatherData, LocationData, ApiError } from '@/types/weather';
 import { API_VALIDATION } from '@/constants/weather';
+import { env } from '@/config/env';
 
 class WeatherService {
-  private readonly baseUrl = 'https://api.openweathermap.org/data/2.5';
-
   async fetchWeatherByCoords(
     lat: number,
     lon: number,
     apiKey: string
   ): Promise<WeatherData> {
-    const url = `${this.baseUrl}/weather?lat=${lat}&lon=${lon}&appid=${apiKey}&units=metric`;
+    const url = `${env.baseWeatherUrl}/weather?lat=${lat}&lon=${lon}&appid=${apiKey}&units=metric`;
     return this.makeRequest(url);
   }
 
@@ -18,7 +17,7 @@ class WeatherService {
     apiKey: string
   ): Promise<WeatherData> {
     const encodedCity = encodeURIComponent(city);
-    const url = `${this.baseUrl}/weather?q=${encodedCity}&appid=${apiKey}&units=metric`;
+    const url = `${env.baseWeatherUrl}/weather?q=${encodedCity}&appid=${apiKey}&units=metric`;
     return this.makeRequest(url);
   }
 
@@ -81,11 +80,6 @@ class WeatherService {
       }
       throw new Error('Failed to fetch weather data');
     }
-  }
-
-  validateApiKey(apiKey: string): boolean {
-    return apiKey.length >= API_VALIDATION.MIN_KEY_LENGTH &&
-      API_VALIDATION.KEY_PATTERN.test(apiKey);
   }
 }
 

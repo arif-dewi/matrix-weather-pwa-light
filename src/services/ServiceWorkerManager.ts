@@ -3,7 +3,6 @@ import { useNotificationStore } from '@/stores/notificationStore';
 import { logger } from './MatrixLogger';
 
 export class ServiceWorkerManager {
-  private updateAvailable = false;
   private registration: ServiceWorkerRegistration | null = null;
   private checkInterval: NodeJS.Timeout | null = null;
 
@@ -103,7 +102,6 @@ export class ServiceWorkerManager {
 
   private handleUpdate() {
     logger.info('Handling Service Worker update');
-    this.updateAvailable = true;
     this.showUpdatePrompt();
   }
 
@@ -257,50 +255,6 @@ export class ServiceWorkerManager {
     }
   }
 
-  // Public methods for external use
-  public async manualUpdate() {
-    logger.info('Manual update check requested');
-    await this.checkForUpdates();
-  }
-
-  public forceUpdate() {
-    if (this.updateAvailable && this.registration?.waiting) {
-      logger.info('Force update requested');
-      this.applyUpdate();
-    } else {
-      logger.warn('Force update requested but no updates available');
-      this.showNotification('No updates available', 'info');
-    }
-  }
-
-  public getStatus() {
-    const status = {
-      updateAvailable: this.updateAvailable,
-      registration: this.registration,
-      isSupported: 'serviceWorker' in navigator
-    };
-
-    logger.debug('Service Worker status requested', status);
-    return status;
-  }
-
-  public async unregister() {
-    if (this.registration) {
-      logger.info('Unregistering Service Worker');
-      this.stopPeriodicUpdateChecks();
-      const success = await this.registration.unregister();
-      if (success) {
-        logger.success('Service Worker unregistered successfully');
-        this.showNotification('Service Worker unregistered', 'info');
-      } else {
-        logger.error('Failed to unregister Service Worker');
-      }
-      return success;
-    }
-    logger.warn('No Service Worker registration to unregister');
-    return false;
-  }
-
   public destroy() {
     logger.info('Destroying Service Worker Manager');
     this.stopPeriodicUpdateChecks();
@@ -312,7 +266,6 @@ export class ServiceWorkerManager {
     window.removeEventListener('appinstalled', this.handleAppInstalled.bind(this));
 
     this.registration = null;
-    this.updateAvailable = false;
 
     logger.success('Service Worker Manager destroyed');
   }

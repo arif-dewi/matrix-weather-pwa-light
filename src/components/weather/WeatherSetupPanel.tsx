@@ -13,8 +13,6 @@ interface WeatherSetupPanelProps {
   formState: {
     showManualLocation: boolean;
     cityName: string;
-    latitude: string;
-    longitude: string;
   };
   updateFormState: (updates: Partial<FormState>) => void;
   handleFetchWeather: (locationOverride?: LocationData) => void;
@@ -79,35 +77,18 @@ export const WeatherSetupPanel: React.FC<WeatherSetupPanelProps> = ({
             className="setup-input"
             disabled={isLoading}
           />
-          <input
-            type="number"
-            placeholder="Latitude"
-            value={formState.latitude}
-            onChange={(e) => updateFormState({ latitude: e.target.value })}
-            step="any"
-            className="setup-input"
-            disabled={isLoading}
-          />
-          <input
-            type="number"
-            placeholder="Longitude"
-            value={formState.longitude}
-            onChange={(e) => updateFormState({ longitude: e.target.value })}
-            step="any"
-            className="setup-input"
-            disabled={isLoading}
-          />
         </div>
       )}
 
-      <button
-        onClick={() => handleFetchWeather()}
-        disabled={isLoading}
-        className="initialize-button"
-      >
-        {isLoading ? '⚡ INITIALIZING...' : '🚀 INITIALIZE MATRIX'}
-      </button>
-
+      {formState.showManualLocation && (
+        <button
+          onClick={() => handleFetchWeather()}
+          disabled={isLoading}
+          className="initialize-button"
+        >
+          {isLoading ? '⚡ INITIALIZING...' : '🚀 INITIALIZE MATRIX'}
+        </button>
+      )}
       <div className={`status-text ${isError ? 'status-error' : ''}`}>
         Status: {getStatusText()}
       </div>

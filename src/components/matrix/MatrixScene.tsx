@@ -1,11 +1,10 @@
 import { Suspense, useMemo } from 'react';
 import { Canvas } from '@react-three/fiber';
-import { useWeatherStore } from '@/stores/weatherStore';
 
 import { PerformanceTier } from '@/types/weather';
 import {getPerformanceTier, isMobileDevice} from '@/utils/device';
 import { MatrixField } from './MatrixField';
-import { LoadingFallback } from '@/components/shared/LoadingFallback';
+import { useWeather } from '@/hooks/useWeather';
 
 const CAMERA = {
   POSITION: {
@@ -33,8 +32,7 @@ const CAMERA = {
 }
 
 export function MatrixScene() {
-  const { weatherData } = useWeatherStore();
-  const matrixEffect = useWeatherStore((s) => s.matrixEffect);
+  const { matrixEffect } = useWeather();
   const performanceTier = getPerformanceTier();
   const isMobile = isMobileDevice();
 
@@ -66,8 +64,6 @@ export function MatrixScene() {
 
     return baseSettings;
   }, [performanceTier, isMobile]);
-
-  if (!weatherData) return <LoadingFallback />;
 
   return (
     <div className="fixed inset-0 w-full h-full z-10">
