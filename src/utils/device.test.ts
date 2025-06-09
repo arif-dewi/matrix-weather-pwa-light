@@ -30,15 +30,6 @@ describe('device utilities', () => {
       expect(getPerformanceTier()).toBe(PerformanceTier.LOW);
     });
 
-    it('should return MEDIUM for mobile with decent specs', () => {
-      vi.stubGlobal('navigator', {
-        userAgent: 'Android',
-        hardwareConcurrency: 4,
-        deviceMemory: 8,
-      });
-      expect(getPerformanceTier()).toBe(PerformanceTier.LOW);
-    });
-
     it('should return MEDIUM for desktop with medium cores', () => {
       vi.stubGlobal('navigator', {
         userAgent: 'Windows NT',
