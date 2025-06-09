@@ -1,11 +1,32 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
+import { visualizer } from 'rollup-plugin-visualizer';
 import path from 'path';
 
 export default defineConfig({
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (id.includes('three')) return 'vendor-three';
+          if (id.includes('@react-three/fiber')) return 'vendor-r3f';
+          if (id.includes('zustand')) return 'vendor-state';
+          if (id.includes('@tanstack')) return 'vendor-query';
+          if (id.includes('react-dom')) return 'vendor-react';
+        }
+      }
+    }
+  },
   plugins: [
     react(),
+    visualizer({
+      open: true,
+      filename: 'bundle-report.html',
+      template: 'treemap',
+      gzipSize: true,
+      brotliSize: true,
+    }),
     VitePWA({
       registerType: 'autoUpdate',
       workbox: {

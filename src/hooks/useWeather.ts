@@ -19,7 +19,7 @@ export const useWeather = () => {
     enabled,
     staleTime: QUERY_CONFIG.STALE_TIME.WEATHER,
     refetchOnWindowFocus: true,
-    refetchInterval: 10 * 60 * 1000,
+    refetchInterval: QUERY_CONFIG.REFETCH_INTERVAL.ACTIVE,
   });
 
   useEffect(() => {

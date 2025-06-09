@@ -1,16 +1,17 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { useState } from 'react';
+import { QUERY_CONFIG } from "@/constants/weather.ts";
 import { env } from '@/config/env';
 
 const queryClientOptions = {
   defaultOptions: {
     queries: {
-      staleTime: 5 * 60 * 1000,
-      retry: 2,
+      staleTime: QUERY_CONFIG.STALE_TIME.WEATHER,
+      retry: QUERY_CONFIG.RETRY.ATTEMPTS,
     },
     mutations: {
-      retry: 1,
+      retry: QUERY_CONFIG.MUTATIONS.RETRY,
     },
   },
 };
