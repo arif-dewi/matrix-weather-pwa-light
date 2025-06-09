@@ -84,3 +84,4 @@ ai/
 .idea/
 # Local Netlify folder
 .netlify
+bundle-report.html

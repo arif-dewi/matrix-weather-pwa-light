@@ -111,18 +111,14 @@ export const QUERY_CONFIG = {
     WEATHER: 5 * 60 * 1000, // 5 minutes
     LOCATION: 30 * 60 * 1000, // 30 minutes
   },
-  CACHE_TIME: {
-    WEATHER: 15 * 60 * 1000, // 15 minutes
-    LOCATION: 60 * 60 * 1000, // 1 hour
-  },
   RETRY: {
-    ATTEMPTS: 3,
-    DELAY_MS: 1000,
-    MAX_DELAY_MS: 30000,
+    ATTEMPTS: 2,
+  },
+  MUTATIONS: {
+    RETRY: 1,
   },
   REFETCH_INTERVAL: {
     ACTIVE: 10 * 60 * 1000, // 10 minutes
-    BACKGROUND: false,
   },
 } as const;
 

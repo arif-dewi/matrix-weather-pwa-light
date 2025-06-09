@@ -5,6 +5,11 @@ import { useWeatherStore } from '@/stores/weatherStore';
 import { weatherService } from '@/services/WeatherService';
 import { useMatrixNotifications } from '@/stores/notificationStore';
 
+const KEY = {
+  ENTER: 'Enter',
+  ESCAPE: 'Escape',
+}
+
 export function WeatherSetup() {
   const { city, apiKey, setCity } = useWeatherStore();
   const notifications = useMatrixNotifications();
@@ -89,6 +94,22 @@ export function WeatherSetup() {
       })
       .catch((err) => notifications.showError(err.message));
   }
+
+  // Submit on Enter key press, close on Escape
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (formState.showSetup) {
+        if (event.key === KEY.ENTER) {
+          handleFetchWeather();
+        } else if (event.key === KEY.ESCAPE) {
+          setFormState((prev) => ({ ...prev, showSetup: false }));
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [formState.showSetup, handleFetchWeather]);
 
   return (
     <>
