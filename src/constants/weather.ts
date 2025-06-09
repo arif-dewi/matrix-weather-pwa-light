@@ -1,5 +1,6 @@
 // src/constants/weather.ts (Updated - remove duplicate enums)
 import { MatrixEffectType, WeatherCondition } from '@/types/weather';
+import { env } from '@/config/env';
 
 // API Configuration
 export const API_VALIDATION = {
@@ -7,7 +8,7 @@ export const API_VALIDATION = {
   KEY_PATTERN: /^[a-f0-9]{32}$/i,
   TIMEOUT_MS: 10000,
   MAX_AGE_MS: 60000,
-  BASE_URL: 'https://api.openweathermap.org/data/2.5',
+  BASE_URL: env.baseWeatherUrl,
 } as const;
 
 // Weather condition to matrix effect mapping

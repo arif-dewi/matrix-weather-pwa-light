@@ -46,7 +46,6 @@ export function useMatrixNotifications() {
   return {
     showSuccess: (message: string, duration?: number) => addNotification(message, 'success', duration),
     showInfo: (message: string, duration?: number) => addNotification(message, 'info', duration),
-    showWarning: (message: string, duration?: number) => addNotification(message, 'warning', duration),
     showError: (message: string, duration?: number) => addNotification(message, 'error', duration),
     removeNotification,
     clearAll: clearAllNotifications

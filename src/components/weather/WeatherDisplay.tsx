@@ -1,24 +1,26 @@
 // components/WeatherDisplay.tsx
-import { useWeatherDisplayData } from '@/hooks/useWeatherDisplayData';
+import { useWeather } from '@/hooks/useWeather.ts';
 import { useWeatherMetrics } from '@/hooks/useWeatherMetrics';
 import { WEATHER_VISUAL_SETTINGS } from '@/constants/matrix';
 import { WeatherDetailItem } from './WeatherDetailItem';
 import { LoadingDisplay } from './LoadingDisplay';
 import { RefreshIndicator } from './RefreshIndicator';
+import {ErrorFallback} from "@/components/shared/ErrorFallback.tsx";
 
 export function WeatherDisplay() {
   const {
     weatherData,
     matrixEffect,
-    isRefetching,
-    refreshError,
+    isLoading,
+    isError,
     lastFetchTime,
-  } = useWeatherDisplayData();
+    refreshError,
+  } = useWeather();
 
   const settings = WEATHER_VISUAL_SETTINGS[matrixEffect];
 
-  if (!weatherData && !refreshError) return null;
-  if (!weatherData) return <LoadingDisplay />;
+  if (isError) return <ErrorFallback error={refreshError} />
+  if (isLoading || !weatherData) return <LoadingDisplay />;
 
   const {
     feelsLikeTemp,
@@ -27,6 +29,7 @@ export function WeatherDisplay() {
     windDirText,
     pressureTrend,
   } = useWeatherMetrics(weatherData);
+
 
   return (
     <div className="weather-display">
@@ -68,7 +71,7 @@ export function WeatherDisplay() {
           <WeatherDetailItem icon="⚡" label="Effect" value={matrixEffect.toUpperCase()} />
         </div>
 
-        <RefreshIndicator isRefetching={isRefetching} lastUpdate={lastFetchTime} />
+        <RefreshIndicator isRefetching={isLoading} lastUpdate={lastFetchTime} />
       </div>
     </div>
   );
