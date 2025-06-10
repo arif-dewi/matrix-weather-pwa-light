@@ -7,12 +7,10 @@ import { initializePWA } from '@/services/ServiceWorkerManager';
 import { logger } from '@/services/MatrixLogger';
 import { ErrorBoundary } from '@/components/ErrorBoundary.tsx';
 import { setupGlobalErrorHandlers, cleanUp } from '@/utils/errorHandling';
-import { setupPerformanceObserver, registerDebugInfo } from '@/utils/performance';
 import {ErrorFallback} from "@/components/shared/ErrorFallback";
 
 // Setup
 setupGlobalErrorHandlers();
-setupPerformanceObserver();
 
 const rootElement = document.getElementById('root');
 if (!rootElement) throw new Error('Root element not found');
@@ -34,7 +32,5 @@ try {
 }
 
 initializePWA().catch((err) => logger.error('PWA init failed', err));
-registerDebugInfo();
-
 
 export default cleanUp;

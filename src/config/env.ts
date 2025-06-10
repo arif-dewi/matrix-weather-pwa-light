@@ -3,8 +3,6 @@
 interface EnvironmentConfig {
   apiKey: string;
   defaultLocation: {
-    latitude: number;
-    longitude: number;
     city: string;
   };
   app: {
@@ -23,8 +21,6 @@ function getOptionalEnvVar(key: string, defaultValue: string): string {
 export const env: EnvironmentConfig = {
   apiKey: getOptionalEnvVar('VITE_OPENWEATHER_API_KEY', ''),
   defaultLocation: {
-    latitude: Number(getOptionalEnvVar('VITE_DEFAULT_LATITUDE', '25.276987')),
-    longitude: Number(getOptionalEnvVar('VITE_DEFAULT_LONGITUDE', '55.296249')),
     city: getOptionalEnvVar('VITE_DEFAULT_CITY', 'Dubai')
   },
   app: {
@@ -37,10 +33,6 @@ export const env: EnvironmentConfig = {
 };
 
 // Validation
-if (!env.apiKey && env.isProduction) {
+if (!env.apiKey) {
   console.warn('⚠️ VITE_OPENWEATHER_API_KEY not found.');
-}
-
-if (env.isDevelopment && !env.apiKey) {
-  console.warn('🔑 Add VITE_OPENWEATHER_API_KEY to .env.local for seamless development experience');
 }

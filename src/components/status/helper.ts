@@ -1,4 +1,4 @@
-export const getStatusConfig = (isOnline: Boolean) => {
+export const getStatusConfig = (isOnline: boolean) => {
   if (isOnline) {
     return {
       icon: '🟢',

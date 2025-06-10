@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { WeatherSetupPanel } from './WeatherSetupPanel';
-import { useWeather } from '@/hooks/useWeather.ts';
+import { useWeather } from '@/hooks/useWeather';
 import { useWeatherStore } from '@/stores/weatherStore';
 import { weatherService } from '@/services/WeatherService';
 import { useMatrixNotifications } from '@/stores/notificationStore';
@@ -11,7 +11,7 @@ const KEY = {
 }
 
 export function WeatherSetup() {
-  const { city, apiKey, setCity } = useWeatherStore();
+  const { city, setCity } = useWeatherStore();
   const notifications = useMatrixNotifications();
   const { weatherData, isLoading, isError } = useWeather();
 
@@ -25,7 +25,7 @@ export function WeatherSetup() {
   useEffect(() => {
     if (!city) {
       weatherService.getCurrentLocation()
-        .then((loc) => weatherService.fetchWeatherByCoords(loc.latitude, loc.longitude, apiKey))
+        .then((loc) => weatherService.fetchWeatherByCoords(loc.latitude, loc.longitude))
         .then((data) => {
           setCity(data.name);
           notifications.showInfo(`Location detected: ${data.name}`);
@@ -82,7 +82,7 @@ export function WeatherSetup() {
 
   const handleGetCurrentLocation = () => {
     weatherService.getCurrentLocation()
-      .then((loc) => weatherService.fetchWeatherByCoords(loc.latitude, loc.longitude, apiKey))
+      .then((loc) => weatherService.fetchWeatherByCoords(loc.latitude, loc.longitude))
       .then((data) => {
         setCity(data.name);
         setFormState({

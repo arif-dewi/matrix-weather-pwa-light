@@ -1,7 +1,7 @@
 // src/stores/notificationStore.ts
 import { create } from 'zustand';
 import type { NotificationData, NotificationType } from '@/components/notifications/MatrixNotification';
-import {NOTIFICATION_CONFIG} from "@/constants/weather.ts";
+import {NOTIFICATION_CONFIG} from "@/constants/weather";
 
 interface NotificationState {
   notifications: NotificationData[];

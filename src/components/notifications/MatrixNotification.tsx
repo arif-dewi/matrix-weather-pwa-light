@@ -1,6 +1,6 @@
 // src/components/notifications/MatrixNotification.tsx
 import { useState, useEffect } from 'react';
-import {MATRIX_COLORS, NOTIFICATION_CONFIG} from "@/constants/weather.ts";
+import { MATRIX_COLORS, NOTIFICATION_CONFIG } from "@/constants/weather";
 
 export type NotificationType = 'success' | 'info' | 'warning' | 'error';
 
@@ -60,7 +60,8 @@ export function MatrixNotification({ notification, onRemove }: MatrixNotificatio
 
   return (
     <div
-      className={`relative matrix-notification w-full max-w-sm cursor-pointer transition-transform duration-300 ease-out ${
+      className={`relative matrix-notification w-full max-w-sm cursor-pointer 
+      transition-transform duration-300 ease-out ${
         isVisible ? 'translate-x-0' : 'translate-x-full'
       }`}
       onClick={handleRemove}

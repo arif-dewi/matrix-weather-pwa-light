@@ -2,6 +2,7 @@
 import { useNotificationStore } from '@/stores/notificationStore';
 import { logger } from './MatrixLogger';
 
+
 export class ServiceWorkerManager {
   private registration: ServiceWorkerRegistration | null = null;
   private checkInterval: NodeJS.Timeout | null = null;
@@ -199,13 +200,13 @@ export class ServiceWorkerManager {
     this.showNotification('Matrix Weather can be installed as an app!', 'info', 6000);
 
     // Store the event for later use (could be used for custom install button)
-    (window as any).deferredInstallPrompt = e;
+    window.deferredInstallPrompt = e;
   }
 
   private handleAppInstalled() {
     logger.success('Matrix Weather PWA installed successfully');
     this.showNotification('Matrix Weather installed successfully!', 'success');
-    (window as any).deferredInstallPrompt = null;
+    window.deferredInstallPrompt = null;
   }
 
   private handleServiceWorkerMessage(event: MessageEvent) {
@@ -282,7 +283,7 @@ export const initializePWA = async () => {
 
     // Export for debugging in development
     if (import.meta.env.DEV) {
-      (window as any).serviceWorkerManager = serviceWorkerManager;
+      window.serviceWorkerManager = serviceWorkerManager;
     }
   } catch (error) {
     logger.error('PWA initialization failed', error);

@@ -5,11 +5,11 @@ import {
   EFFECT_MULTIPLIERS,
   MOVEMENT_BOUNDS,
   PARTICLE_COUNTS
-} from "@/constants/weather.ts";
-import { MATRIX_CONFIG } from "@/constants/matrix.ts";
-import { getOptimalPixelRatio } from "@/utils/device.ts";
-import {MatrixEffectType, PerformanceTier} from "@/types/weather.ts";
-import { AnimationData } from "./types.ts";
+} from "@/constants/weather";
+import { MATRIX_CONFIG } from "@/constants/matrix";
+import { getOptimalPixelRatio } from "@/utils/device";
+import { MatrixEffectType, PerformanceTier, WeatherVisualSettings } from "@/types/weather";
+import { AnimationData } from "./types";
 
 export function createCharacterTexture(character: string, color: string, isMobile: boolean): THREE.Texture {
   const canvas = document.createElement('canvas');
@@ -44,7 +44,7 @@ export function updateParticlePosition(
   mesh: THREE.Sprite,
   data: AnimationData,
   effectType: MatrixEffectType,
-  settings: any,
+  settings: WeatherVisualSettings,
   time: number,
   delta: number,
   isMobile: boolean
@@ -57,6 +57,8 @@ export function updateParticlePosition(
     mesh.position.x = (Math.random() - 0.5) * MOVEMENT_BOUNDS.X;
     mesh.position.z = (Math.random() - 0.5) * MOVEMENT_BOUNDS.Z;
   };
+
+  const stormIntensity = isMobile ? 0.6 : 1;
 
   switch (effectType) {
     case MatrixEffectType.SUN:
@@ -77,7 +79,6 @@ export function updateParticlePosition(
       mesh.position.y = data.originalPosition[1] + Math.cos(time * 1.5 + data.floatPhase) * 2 * dampening;
       break;
     case MatrixEffectType.STORM:
-      const stormIntensity = isMobile ? 0.6 : 1;
       mesh.position.x = data.originalPosition[0] + Math.sin(time * ANIMATION_SPEEDS.CHAOTIC + data.floatPhase) * 4 * stormIntensity;
       mesh.position.y = data.originalPosition[1] + Math.cos(time * 2.5 + data.floatPhase) * 3 * stormIntensity;
       mesh.position.z = data.originalPosition[2] + Math.sin(time * ANIMATION_SPEEDS.FAST + data.floatPhase) * 2 * stormIntensity;

@@ -1,11 +1,11 @@
 // components/WeatherDisplay.tsx
-import { useWeather } from '@/hooks/useWeather.ts';
+import { useWeather } from '@/hooks/useWeather';
 import { useWeatherMetrics } from '@/hooks/useWeatherMetrics';
 import { WEATHER_VISUAL_SETTINGS } from '@/constants/matrix';
 import { WeatherDetailItem } from './WeatherDetailItem';
 import { LoadingDisplay } from './LoadingDisplay';
 import { RefreshIndicator } from './RefreshIndicator';
-import {ErrorFallback} from "@/components/shared/ErrorFallback.tsx";
+import {ErrorFallback} from "@/components/shared/ErrorFallback";
 
 export function WeatherDisplay() {
   const {

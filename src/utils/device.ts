@@ -1,5 +1,5 @@
-import { PERFORMANCE_THRESHOLDS } from '@/constants/device.ts';
-import { PerformanceTier } from '@/types/device.ts';
+import { PERFORMANCE_DEFAULT, PERFORMANCE_THRESHOLDS } from '@/constants/device';
+import { PerformanceTier } from '@/types/device';
 
 /**
  * Device detection utilities using proper enums and constants
@@ -10,8 +10,8 @@ export const isMobileDevice = (): boolean => {
 
 export const getPerformanceTier = (): PerformanceTier => {
   const isMobile = isMobileDevice();
-  const hardwareConcurrency = navigator.hardwareConcurrency || 2;
-  const deviceMemory = (navigator as any).deviceMemory || 4;
+  const hardwareConcurrency = navigator.hardwareConcurrency || PERFORMANCE_DEFAULT.HARDWARE_CONCURRENCY;
+  const deviceMemory: number = 'deviceMemory' in navigator ? navigator.deviceMemory as number : PERFORMANCE_DEFAULT.MEMORY;
 
   if (isMobile && (hardwareConcurrency <= PERFORMANCE_THRESHOLDS.LOW_CORES || deviceMemory <= PERFORMANCE_THRESHOLDS.LOW_MEMORY)) {
     return PerformanceTier.LOW;

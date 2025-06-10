@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { MatrixEffectType, PerformanceTier } from '@/types/weather';
+import { MatrixEffectType, PerformanceTier, WeatherVisualSettings } from '@/types/weather';
 import { MOVEMENT_BOUNDS } from '@/constants/weather';
 import {
   getParticleCount,
@@ -7,7 +7,7 @@ import {
   updateParticlePosition
 } from './helper';
 import {Sprite} from "three";
-import {AnimationData} from "@/components/matrix/types.ts";
+import {AnimationData} from "@/components/matrix/types";
 
 describe('Matrix heler', () => {
 
@@ -145,7 +145,7 @@ describe('Matrix heler', () => {
 
     const mockSettings = {
       speedFactor: 1.0
-    };
+    } as WeatherVisualSettings;
 
     describe('updateParticlePosition', () => {
       const time = 2.5;

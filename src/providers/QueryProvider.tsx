@@ -1,7 +1,7 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { useState } from 'react';
-import { QUERY_CONFIG } from "@/constants/weather.ts";
+import { QUERY_CONFIG } from "@/constants/weather";
 import { env } from '@/config/env';
 
 const queryClientOptions = {
