@@ -2,10 +2,7 @@
 
 > An immersive weather application featuring Matrix-inspired 3D particle effects that dynamically respond to real-time weather conditions. Built with cutting-edge React architecture, performance optimization, and enterprise-grade patterns.
 
-[![CI](https://github.com/username/matrix-weather/actions/workflows/ci.yml/badge.svg)](https://github.com/username/matrix-weather/actions/workflows/ci.yml)
-[![Tests](https://github.com/username/matrix-weather/actions/workflows/tests.yml/badge.svg)](https://github.com/username/matrix-weather/actions/workflows/tests.yml)
-[![Build Status](https://github.com/username/matrix-weather/actions/workflows/build.yml/badge.svg)](https://github.com/username/matrix-weather/actions/workflows/build.yml)
-[![codecov](https://codecov.io/gh/username/matrix-weather/branch/main/graph/badge.svg)](https://codecov.io/gh/username/matrix-weather)
+![CI](https://img.shields.io/github/actions/workflow/status/arif-dewi/matrix-weather-pwa-light/.github%2Fworkflows%2Fmain.yml)
 [![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=flat-square&logo=typescript&logoColor=white)](https://typescriptlang.org/)
 [![React](https://img.shields.io/badge/React-20232A?style=flat-square&logo=react&logoColor=61DAFB)](https://reactjs.org/)
 [![Three.js](https://img.shields.io/badge/Three.js-000000?style=flat-square&logo=three.js&logoColor=white)](https://threejs.org/)
@@ -92,8 +89,8 @@ OpenWeatherMap API Key (free tier available)
 ### Quick Start
 ```bash
 # Clone repository
-git clone https://github.com/username/matrix-weather.git
-cd matrix-weather
+git clone https://github.com/arif-dewi/matrix-weather-pwa-light.git
+cd matrix-weather-pwa-light
 
 # Install dependencies
 npm install
@@ -450,10 +447,9 @@ MIT License - see [LICENSE](LICENSE) file for details.
 *Matrix Weather showcases advanced frontend engineering: real-time data synchronization, 3D graphics programming, Progressive Web App capabilities, adaptive performance optimization, and immersive user experience design.*
 
 ## 📈 Project Stats
-
-![GitHub repo size](https://img.shields.io/github/repo-size/username/matrix-weather?style=flat-square)
-![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/username/matrix-weather?style=flat-square)
-![GitHub top language](https://img.shields.io/github/languages/top/username/matrix-weather?style=flat-square)
-![GitHub last commit](https://img.shields.io/github/last-commit/username/matrix-weather?style=flat-square)
-![GitHub issues](https://img.shields.io/github/issues/username/matrix-weather?style=flat-square)
-![GitHub pull requests](https://img.shields.io/github/issues-pr/username/matrix-weather?style=flat-square)
+![GitHub repo size](https://img.shields.io/github/repo-size/arif-dewi/matrix-weather-pwa-light?style=flat-square)
+![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/arif-dewi/matrix-weather-pwa-light?style=flat-square)
+![GitHub top language](https://img.shields.io/github/languages/top/arif-dewi/matrix-weather-pwa-light?style=flat-square)
+![GitHub last commit](https://img.shields.io/github/last-commit/arif-dewi/matrix-weather-pwa-light?style=flat-square)
+![GitHub issues](https://img.shields.io/github/issues/arif-dewi/matrix-weather-pwa-light?style=flat-square)
+![GitHub pull requests](https://img.shields.io/github/issues-pr/arif-dewi/matrix-weather-pwa-light?style=flat-square)
