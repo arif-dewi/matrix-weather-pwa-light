@@ -1,20 +1,5 @@
 import { env } from '@/config/env';
 
-declare global {
-  interface Window {
-    workbox?: {
-      logger?: {
-        debug: (message: string) => void;
-        log: (message: string) => void;
-        warn: (message: string) => void;
-        error: (message: string) => void;
-        groupCollapsed: (title: string) => void;
-        groupEnd: () => void;
-      };
-    };
-  }
-}
-
 type Operation = 'debug' | 'info' | 'warn' | 'error' | 'success';
 type ConsoleFunction = 'debug' | 'log' | 'warn' | 'error';
 
@@ -48,7 +33,7 @@ class MatrixLogger {
     return window.workbox?.logger;
   }
 
-  private log(operation: Operation, message: string, data?: any) {
+  private log(operation: Operation, message: string, data?: unknown) {
     const formatted = `${emojiPrefixMap[operation]} ${message}`;
 
     const wbLogger = this.logger;
@@ -66,23 +51,23 @@ class MatrixLogger {
     }
   }
 
-  debug(message: string, data?: any) {
+  debug(message: string, data?: unknown) {
     this.log('debug', message, data);
   }
 
-  info(message: string, data?: any) {
+  info(message: string, data?: unknown) {
     this.log('info', message, data);
   }
 
-  warn(message: string, data?: any) {
+  warn(message: string, data?: unknown) {
     this.log('warn', message, data);
   }
 
-  error(message: string, data?: any) {
+  error(message: string, data?: unknown) {
     this.log('error', message, data);
   }
 
-  success(message: string, data?: any) {
+  success(message: string, data?: unknown) {
     this.log('success', message, data);
   }
 

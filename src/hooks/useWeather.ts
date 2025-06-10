@@ -2,20 +2,19 @@ import { useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { weatherService } from '../services/WeatherService';
 import { QUERY_CONFIG } from '@/constants/weather';
-import { useWeatherStore, useCity, useApiKey, useMatrixEffect } from '@/stores/weatherStore';
-import {WeatherData} from "@/types/weather.ts";
+import { useWeatherStore, useCity, useMatrixEffect } from '@/stores/weatherStore';
+import { WeatherData } from "@/types/weather";
 
 export const useWeather = () => {
   const city = useCity()
-  const apiKey = useApiKey()
   const matrixEffect = useMatrixEffect()
   const updateMatrixEffect = useWeatherStore((s) => s.updateMatrixEffect);
 
-  const enabled = Boolean(city && apiKey);
+  const enabled = Boolean(city);
 
   const query = useQuery({
     queryKey: city ? ['weather', city] : ['weather-disabled'],
-    queryFn: () => weatherService.fetchWeatherByCity(city!, apiKey),
+    queryFn: () => weatherService.fetchWeatherByCity(city!),
     enabled,
     staleTime: QUERY_CONFIG.STALE_TIME.WEATHER,
     refetchOnWindowFocus: true,

@@ -104,3 +104,8 @@ export interface ApiError {
   cod: string | number;
   message: string;
 }
+
+export type ServiceWorkerManagerInterface = {
+  initialize: () => Promise<void>;
+  destroy: () => void;
+}

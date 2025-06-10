@@ -3,21 +3,29 @@ import { API_VALIDATION } from '@/constants/weather';
 import { env } from '@/config/env';
 
 class WeatherService {
+  constructor(apiKey: string) {
+    if (apiKey && apiKey.length < API_VALIDATION.MIN_KEY_LENGTH) {
+      throw new Error(`API key must be at least ${API_VALIDATION.MIN_KEY_LENGTH} characters long`);
+    }
+
+    this.apiKey = apiKey;
+  }
+
+  private apiKey: string = env.apiKey;
+
   async fetchWeatherByCoords(
     lat: number,
     lon: number,
-    apiKey: string
   ): Promise<WeatherData> {
-    const url = `${env.baseWeatherUrl}/weather?lat=${lat}&lon=${lon}&appid=${apiKey}&units=metric`;
+    const url = `${env.baseWeatherUrl}/weather?lat=${lat}&lon=${lon}&appid=${this.apiKey}&units=metric`;
     return this.makeRequest(url);
   }
 
   async fetchWeatherByCity(
     city: string,
-    apiKey: string
   ): Promise<WeatherData> {
     const encodedCity = encodeURIComponent(city);
-    const url = `${env.baseWeatherUrl}/weather?q=${encodedCity}&appid=${apiKey}&units=metric`;
+    const url = `${env.baseWeatherUrl}/weather?q=${encodedCity}&appid=${this.apiKey}&units=metric`;
     return this.makeRequest(url);
   }
 
@@ -83,4 +91,4 @@ class WeatherService {
   }
 }
 
-export const weatherService = new WeatherService();
+export const weatherService = new WeatherService(env.apiKey);

@@ -4,3 +4,8 @@ export const PERFORMANCE_THRESHOLDS = {
   HIGH_MEMORY: 8,
   HIGH_CORES: 8,
 } as const;
+
+export const PERFORMANCE_DEFAULT = {
+  MEMORY: 4,
+  HARDWARE_CONCURRENCY: 2,
+}
